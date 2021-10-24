@@ -7,17 +7,7 @@ const statusController = require("./statusController");
 const bcrypt = require("bcrypt");
 
 exports.registerUser = async (req, res) => {
-    /*if(!req.body){
-        statusController.putJSONError(req, res, new Error("Register Error", "Request body must not be empty!", 400));
-        console.log("Register User Attempt failed since request body was empty.");
-        return;
-    }*/
-
-
-
     const {username,email, password, password2} = req.fields && req.fields.length > 1 ? req.fields: req.query;
-    
-    
     console.log('Register User Attempt: Username: "' + username+ '", email: "' + email+ '", password: "' + password);
     if(!username || !email || !password || !password2) {
         statusController.putJSONError(req, res, new Error("Register Error", "Please provide all fields!", 400));
