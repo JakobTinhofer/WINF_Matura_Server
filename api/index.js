@@ -6,7 +6,5 @@ const formidable = require('express-formidable');
 
 app.use(formidable());
 
-
-
 app.use(require('./routes'))
 module.exports = app;

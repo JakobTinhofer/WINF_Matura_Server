@@ -75,8 +75,7 @@ exports.registerUser = async (req, res) => {
                 //save user
                 newUser.save()
                 .then((value)=>{
-                    console.log(value)
-                    res.redirect('/users/login');
+                    console.log(value);
                 }).catch(value=> console.log(value));
                       
             })
@@ -92,9 +91,26 @@ exports.require_login = async (req, res) => {
 
 }
 
+exports.check_login_status = async (req, res) => {
+    if(req.session && req.session.authenticated){
+        res.json({'authenticated' : req.session.authenticated});
+    }else{
+        res.json({'authenticated' : false});
+    }
+        
+}
+
 
 exports.logout_user = async (req, res) => {
+    if(!req.session || !req.session.user){
+        console.log("Logout attempt failed since already not logged in.");
+        statusController.putJSONError(req, res, new Error("Logout Error", "You need to be logged in in order to log out."));
+        return;
+    }
+    console.log("User " + req.session.user.username + " logged out.");
     req.session.destroy();
+    statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully logged out."));
+
 }
 
 
