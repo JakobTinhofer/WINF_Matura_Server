@@ -20,7 +20,6 @@
 
 
     function set_state(state){
-        console.log("Overlay set state to " + state);
         var bool = convertToBool(state);
         if(document.readyState === "complete" && overlay_div){
             if(bool){

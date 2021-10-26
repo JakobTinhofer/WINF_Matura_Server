@@ -14,28 +14,23 @@
 	let subtitle = "Sorry if this takes a bit.";
 	let msg_color = "orange";
 	let show_home_link = false;
-	let routed = true;
+	let routed = false;
 	
 
 	function startRouting(location){
-		console.log("Location " + location)
 		switch (location) {
 			case "/login":
 			case "/signup":
 				active_page = LoginSignup;
 				break;
 			case "/loading":
-				break;
+				return;
 			case "/":
 			case "":
 				active_page = Main;
 				break;
 			default:
 				window.addEventListener("load",  () => {
-					console.log(animId);
-					if(animId != -1){
-						clearInterval(animId);
-					}
 					Array.prototype.forEach.call(document.getElementsByClassName("animated-point"), elem => {
 						elem.style.visibility  = "hidden";
 					});
@@ -44,9 +39,19 @@
 					subtitle = "Could not locate Page '" + location + "'. Did you misspell the url?";
 					show_home_link = true;
 				});
-				return;	
+				break;	
 		}
-
+		routed = true;
+		if(animId != -1){
+			clearInterval(animId);
+			animId = -1;
+		}
+		window.addEventListener("load", () => {
+			if(animId != -1){
+				clearInterval(animId);
+				animId = -1;
+			}
+		});
 	}
 
 	window.addEventListener("load", startAnimation);
@@ -119,9 +124,11 @@
 
 {#if active_page}
 	<svelte:component this={ active_page }/>
-	<script>
-		//clearInterval({animId});
-	</script>
+	{#if animId != -1}
+		<script>
+			clearInterval({animId});
+		</script>
+	{/if}
 {:else}
 		<head>
 			<title>{title}</title>

@@ -25,7 +25,6 @@
         let bool = convertToBool(open_or_not);
         if(bool){
             bar.style.width = barWidth;
-            console.log("setting overlay to show.");
         }else{
             bar.style.width = 0;
         }

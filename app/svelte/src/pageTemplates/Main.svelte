@@ -6,8 +6,12 @@
 
     let loggedIn = false;
     checkLoggedIn().then((res) => {loggedIn = res;}, (err) => {console.debug(err);});
-    function handleAccountButtonClicked(){
-        console.log("clocked");
+    function handleAccountButtonClicked(btn, src){
+        if(loggedIn){
+            alert("Account page coming soon!");
+        }else{
+            window.location.pathname = "login";
+        }
     }
 </script>
 

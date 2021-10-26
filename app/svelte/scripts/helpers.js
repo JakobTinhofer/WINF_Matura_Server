@@ -8,5 +8,6 @@ exports.convertToBool = (val) => {
     if(typeof val === 'boolean' || val instanceof Boolean){
         return val;
     }
+    console.debug(val);
     throw "Value cannot be converted. Sorry.";
 }

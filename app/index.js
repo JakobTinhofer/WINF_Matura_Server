@@ -10,7 +10,7 @@ app.get("/test", (req, res) => {
     res.json({'jes' : '1'});
 });
 
-app.get("/", (req, res) => {
+app.get("*", (req, res) => {
     res.sendFile("./svelte/public/index.html", {root: path.join(__dirname)});
 });
 
