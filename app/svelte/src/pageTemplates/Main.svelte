@@ -2,7 +2,7 @@
     import Navbar from "../modules/Navbar.svelte";
     import NavbarElement from "../modules/NavbarElement.svelte";
     import {checkLoggedIn} from "../../scripts/auth";
-
+    import Overlay from "../modules/Overlay.svelte";
 
     let loggedIn = false;
     checkLoggedIn().then((res) => {loggedIn = res;}, (err) => {console.debug(err);});

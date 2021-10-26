@@ -13,6 +13,7 @@ exports.checkLoggedIn = async function (){
         
     } catch (error) {
         console.log(error);
+        return false;
     }
     
     
