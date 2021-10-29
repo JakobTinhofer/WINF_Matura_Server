@@ -1,4 +1,5 @@
 var nm = require('nodemailer');
+const Verification = require('../models/Verification');
 var templates = require('./templates');
 
 transporter = nm.createTransport({
@@ -10,10 +11,11 @@ transporter = nm.createTransport({
 });
 
 console.log("Trying to log into gmail with username winf2021.2022@gmail.com and password " + process.env['GMAIL_PASSWORD']);
+templates.loadTemplate(__dirname + "/templates/verification_message.html", "verification_message");
 templates.loadTemplate(__dirname + "/templates/server_status.html", "server_status").then((res) => {
     exports.sendStatusEmail('jak.tinhofer@billrothgymnasium.at',
         'Server Online',
-        'Hi there! The WINF server is now online and ready! Development mode: ' + (process.env['DEV_MODE']),
+        `Hi there! The WINF server is now online at <a href="${process.env['HOSTNAME']}">${process.env['HOSTNAME']}</a> and ready! Development mode: ${(process.env['DEV_MODE'])}`,
         'royalblue');
     console.debug(process.env['DEV_MODE']);
     console.log("Sent server online email!");
@@ -30,6 +32,21 @@ exports.sendStatusEmail = async (rec, status_title, status_message, status_color
             status_title: status_title,
             status_color: status_color,
             status_message: status_message
+        })
+    }
+    return await transporter.sendMail(mailOptions);
+}
+
+exports.sendVerificationEmail = async (verification) => {
+    let link = process.env['HOSTNAME'] + "/verify?secret=" + verification.secret;
+    var mailOptions = {
+        from: 'WINF 2021 / 2022',
+        to: verification.user.email,
+        subject: 'Activate your account',
+        text: 'The HTML version of this email was unable to load. Please activate your account by clicking this link: ' + link,
+        html: (await templates.getTemplate("verification_message")).build({
+            username: verification.user.username,
+            activate_link: link
         })
     }
     return await transporter.sendMail(mailOptions);

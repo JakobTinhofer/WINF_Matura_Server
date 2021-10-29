@@ -1,14 +1,16 @@
 let mongoose = require("mongoose");
 const User = require("../models/User");
+const Verification = require("../models/Verification");
 const Error = require("../classes/Error");
 const SuccessMessage = require("../classes/SuccessMessage");
 const session = require("express-session");
+const mailer = require("../mail/mailer")
 const statusController = require("./statusController");
 const bcrypt = require("bcrypt");
 
 exports.registerUser = async (req, res) => {
     const {username,email, password, password2} = req.fields ? req.fields: req.query;
-    console.log('Register User Attempt: Username: "' + username+ '", email: "' + email+ '", password: "' + password + '"');
+    console.log('Register User Attempt: Username: "' + username+ '"and email: "' + email+ '"');
     if(!username || !email || !password || !password2) {
         statusController.putJSONError(req, res, new Error("Register Error", "Please provide all fields!", 400, -1));
         console.log("Register User Attempt failed since not all fields have been provided.");
@@ -67,7 +69,8 @@ exports.registerUser = async (req, res) => {
             email: email,
             username: username,
             sec_level: 0,
-            password_hash: password
+            password_hash: password,
+            verified: false
         });
 
         bcrypt.genSalt(10,(err,salt)=> 
@@ -83,6 +86,8 @@ exports.registerUser = async (req, res) => {
                 newUser.save()
                 .then((value)=>{
                     console.log(value);
+                    await mailer.sendVerificationEmail(await Verification.getOrCreateNew(newUser));
+                    console.log("Sent verification email!");
                 }).catch(value=> console.log(value));
                       
             })
@@ -92,12 +97,36 @@ exports.registerUser = async (req, res) => {
         return;
     });
 }
-
-
 exports.require_login = async (req, res) => {
 
 }
+exports.verify_user = async (req, res) => {
+    let {verify_secret} = req.query;
+    let ver = await Verification.find({secret: verify_secret});
 
+    if(!userQuerry || userQuerry.length < 1){
+        res.putJSONError(req, res, new Error("Verification Error", "The verify link seems to be wrong... don't know if you or we messed up here...", 404, 0));
+        console.log("Could not verify user since verify secret was not found in database.");
+        return;
+    }
+    if(ver.length > 1){
+        res.putJSONError(req, res, new Error("Verification Error", "Double entry in DB. If this were my job, I'd get fired.", 500, 1));
+        console.log("Fatal error: double entry for verification secret!");
+        return;
+    }
+    const verification = ver[0];
+
+    if(verification.alreadyVerified){
+        res.json(JSON.stringify({message: 'Already verified!'}));
+        console.log("User " + verification.user.username + " tried to verify, but is already verified!");
+        return;
+    }
+
+    verification.user.verified = true;
+    res.putJSONSuccess(req, res, new SuccessMessage("Account verified!", verification.user));
+    await verification.user.save();
+    console.log("Successfully verified user!");
+}
 exports.check_login_status = async (req, res) => {
     if(req.session && req.session.authenticated){
         res.json(JSON.stringify({'authenticated' : req.session.authenticated}));
@@ -106,8 +135,6 @@ exports.check_login_status = async (req, res) => {
     }
         
 }
-
-
 exports.logout_user = async (req, res) => {
     if(!req.session || !req.session.user){
         console.log("Logout attempt failed since already not logged in.");
@@ -129,7 +156,7 @@ exports.login_user = async (req, res) => {
     }
 
     const {usernameOrEmail, password, rememberMe} = req.fields ? req.fields: req.query;
-    console.log("Login attempt with username/email '" + usernameOrEmail + "', password '" + password + "', and rememberMe='" + rememberMe + "'.");
+    console.log("Login attempt with username/email '" + usernameOrEmail + "' and rememberMe='" + rememberMe + "'.");
 
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     let userQuerry;
