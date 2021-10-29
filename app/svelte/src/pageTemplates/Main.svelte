@@ -57,6 +57,14 @@
     .fa-user{
         margin-right: 10px;
     }
+
+    #generelle-infos{
+        padding: 50px;
+    }
+
+    #generelle-infos h1{
+        font-family: 'Roboto', sans-serif;
+    }
 </style>
 
 <head>
@@ -67,15 +75,15 @@
 <div class="header">
     <Navbar>
         <svelte:fragment>
-            <NavbarElement>Home</NavbarElement>
-            <NavbarElement>Blog</NavbarElement>
-            <NavbarElement>About</NavbarElement>
+            <NavbarElement>Generelle Infos</NavbarElement>
+            <NavbarElement>Themen</NavbarElement>
+            <NavbarElement>Mehr</NavbarElement>
             {#if loggedIn}
                 <span style="float:right">
                     <Dropdown>
                         <NavbarElement>
                             <i class="fas fa-user"></i>
-                            <p>{user !== undefined ? "Hello " + user.username : "Account"}</p>
+                            <p>{user !== undefined ? "Hallo " + user.username : "Account"}</p>
                         </NavbarElement>
                         <svelte:fragment slot="dropdown-list-elems">
                             <NavbarElement on:click="{logOutClicked}">Log Out</NavbarElement>
@@ -90,4 +98,7 @@
         </svelte:fragment>
     </Navbar>
     <h1>Hello, Traveler</h1>
+</div>
+<div id="generelle-infos">
+    <h1>Generelle Infos zur Informatikmatura 2021/2022</h1>
 </div>

@@ -33,7 +33,7 @@ exports.checkLoggedIn = async function (callback){
 }
 
 exports.tryLogIn = async function (uoe, password, rememberMe, callback){
-    module.exports.getOwnUser();
+    
     let url = api_url + "/api/users/login";
     const u = new URLSearchParams();
     u.append("usernameOrEmail", uoe);
@@ -46,9 +46,10 @@ exports.tryLogIn = async function (uoe, password, rememberMe, callback){
             body: u
         });
         let result = JSON.parse(await res.json());
+        console.debug(result);
         if(res.status === 200){
             cached = result.result;
-            return [String(result.title).toLocaleLowerCase() === "login successfull.", undefined];
+            return [String(result.message).toLocaleLowerCase() === "login successfull.", undefined];
         }
         else if(res.status === 400 || res.status === 403){
             return [false,  result.message];

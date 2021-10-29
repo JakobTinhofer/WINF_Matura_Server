@@ -550,7 +550,7 @@
         <div class="card box_shadow_light">
             <span style="display: none" class="validated-eup invalid-eup"></span>
             <h1>{heading}</h1>
-            <p style="border-left: 3px solid {message.length > 0 ? "red" : "transparent"}"> {message}</p>
+            <p style="border-left: 3px solid {message && message.length > 0 ? "red" : "transparent"}"> {message}</p>
             {#if isAlreadySignedIn}
                 <p>You are already signed in.</p>
                 <input type="submit" value="Sign Out" on:click="{signOut}" />
