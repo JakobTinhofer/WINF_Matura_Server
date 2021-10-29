@@ -117,6 +117,7 @@
         padding: 0px;
         text-align: left;
         margin: 0px;
+        font-size: 0px;
     }
     #navbar :global(*){
         color: white;

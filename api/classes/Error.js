@@ -1,8 +1,9 @@
 class Error {
-    constructor(title, message, code){
+    constructor(title, message, status, errorCode){
         this.title = title;
         this.message = message;
-        this.code = code;
+        this.status = status;
+        this.errorCode = errorCode;
     }
 }
 

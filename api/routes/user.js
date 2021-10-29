@@ -30,7 +30,7 @@ router.post("/login", userController.login_user);
 router.post("/register", userController.registerUser);
 router.post("/logout", userController.logout_user);
 router.post("/check", userController.check_login_status);
-
+router.post("/userinfo", userController.getUserInfo);
 
 router.get("/test", (req, res) => {
     res.status(200);

@@ -1,7 +1,7 @@
 class SuccessMessage{
-    constructor(title, message){
-        this.title = title;
+    constructor(message, result){
         this.message = message;
+        this.result = result;
     }
 }
 

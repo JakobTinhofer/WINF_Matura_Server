@@ -29,7 +29,10 @@ bcrypt.hash(process.memoryUsage().heapTotal + "That's mad fam." + process.hrtime
     app.use(sessions({
         secret: hash,
         saveUninitialized:true,
-        resave: false 
+        resave: false,
+        cookie: {
+            sameSite: 'Strict'
+        }
     }));
     console.log("Enabled sessions!");
 

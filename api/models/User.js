@@ -20,6 +20,10 @@ let userSchema = mongoose.Schema({
   created: {
     type: Date,
     default: Date.now()
+  },
+  verified: {
+    type: Boolean,
+    default: false
   }
 });
 var User = mongoose.model("User", userSchema);

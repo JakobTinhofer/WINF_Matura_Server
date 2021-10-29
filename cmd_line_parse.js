@@ -15,6 +15,18 @@ for (let i = 0; i < args.length; i++){
                 process.exit(1);
             }
             break;
+        case "-p":
+        case "--gmail-password":
+        case "--mail-password":
+            if(i + 1 < args.length && !args[i + 1].startsWith("-")){
+                process.env["GMAIL_PASSWORD"] = args[i + 1];
+                i++;
+            }
+            else{
+                console.log("Invalid argument! Either the value provided for mongo ip is an argument itsself, or it is not provided!");
+                process.exit(1);
+            }
+            break;
         case "--debug":
         case "--dev":
         case "-d":
