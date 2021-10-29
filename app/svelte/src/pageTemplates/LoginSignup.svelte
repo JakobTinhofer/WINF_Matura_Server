@@ -590,7 +590,7 @@
                 </form>
             {:else}
             <form on:change="{validateSignup}"  on:submit="{submitSignup}">
-                <label for="email">Email: </label>
+                <label for="email">Email (you will need to activate your account): </label>
                 <input type="text" on:keyup="{validateSignupNotStrict}" placeholder="Email" id="email" class="emailUsernamePassword box_shadow_light {signup_classes['email']}" bind:value="{email}" name="email" disabled={__di_str}/>
                 <label for="username">Username: </label>
                 <input type="text" on:keyup="{validateSignupNotStrict}" placeholder="Username" id="username" class="emailUsernamePassword box_shadow_light {signup_classes['username']}" bind:value="{username}" name="username" disabled={__di_str}/>

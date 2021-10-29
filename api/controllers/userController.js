@@ -188,6 +188,12 @@ exports.login_user = async (req, res) => {
             return;
         }
         if(isMatch){
+            if(user.verified !== true){
+                statusController.putJSONError(req, res, new Error("Login Error", "Your account has not yet been activated! Please check your emails.", 403, 0));
+                console.log("Blocked login since account has not yet been activated.");
+                return;
+            }
+
             req.session.user = user;
             req.session.authenticated = true;
             console.log("User '" + user.username + "' logged in succesfully!");
