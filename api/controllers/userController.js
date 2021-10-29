@@ -84,7 +84,7 @@ exports.registerUser = async (req, res) => {
                 newUser.password_hash = hash;
                 //save user
                 newUser.save()
-                .then((value)=>{
+                .then(async (value)=>{
                     console.log(value);
                     await mailer.sendVerificationEmail(await Verification.getOrCreateNew(newUser));
                     console.log("Sent verification email!");
@@ -101,30 +101,38 @@ exports.require_login = async (req, res) => {
 
 }
 exports.verify_user = async (req, res) => {
-    let {verify_secret} = req.query;
-    let ver = await Verification.find({secret: verify_secret});
+    let {secret} = req.fields ? req.fields: req.query;
 
-    if(!userQuerry || userQuerry.length < 1){
-        res.putJSONError(req, res, new Error("Verification Error", "The verify link seems to be wrong... don't know if you or we messed up here...", 404, 0));
+    console.log("Trying to verify user with secret " + secret);
+
+    let ver = await Verification.find({secret: secret});
+
+    if(!ver || ver.length < 1){
+        statusController.putJSONError(req, res, new Error("Verification Error", "The verify link seems to be wrong... don't know if you or we messed up here...", 404, 0));
         console.log("Could not verify user since verify secret was not found in database.");
         return;
     }
     if(ver.length > 1){
-        res.putJSONError(req, res, new Error("Verification Error", "Double entry in DB. If this were my job, I'd get fired.", 500, 1));
+        statusController.putJSONError(req, res, new Error("Verification Error", "Double entry in DB. If this were my job, I'd get fired.", 500, 1));
         console.log("Fatal error: double entry for verification secret!");
         return;
     }
     const verification = ver[0];
 
     if(verification.alreadyVerified){
-        res.json(JSON.stringify({message: 'Already verified!'}));
+        statusController.putJSONSuccess(req, res, new SuccessMessage("You were already verified!", verification.user));
         console.log("User " + verification.user.username + " tried to verify, but is already verified!");
         return;
     }
 
-    verification.user.verified = true;
-    res.putJSONSuccess(req, res, new SuccessMessage("Account verified!", verification.user));
-    await verification.user.save();
+    statusController.putJSONSuccess(req, res, new SuccessMessage("Account verified!", verification.user));
+
+    let user = await User.findById(verification.user._id);
+    user.verified = true;
+
+    await user.save();
+    verification.alreadyVerified = true;
+    verification.save();
     console.log("Successfully verified user!");
 }
 exports.check_login_status = async (req, res) => {

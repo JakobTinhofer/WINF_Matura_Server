@@ -2,6 +2,7 @@
 	import Main from "./pageTemplates/Main.svelte";
 	import UserPage from "./pageTemplates/UserPage.svelte";
 	import LoginSignup from "./pageTemplates/LoginSignup.svelte";
+	import VerificationWrapper from "./pageTemplates/VerificationWrapper.svelte";
 
 	import anime from "animejs/lib/anime.es.js";
 
@@ -22,6 +23,9 @@
 			case "/login":
 			case "/signup":
 				active_page = LoginSignup;
+				break;
+			case "/verify":
+				active_page = VerificationWrapper;
 				break;
 			case "/loading":
 				return;

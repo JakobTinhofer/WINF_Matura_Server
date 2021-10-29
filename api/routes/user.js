@@ -31,6 +31,7 @@ router.post("/register", userController.registerUser);
 router.post("/logout", userController.logout_user);
 router.post("/check", userController.check_login_status);
 router.post("/userinfo", userController.getUserInfo);
+router.post("/verify", userController.verify_user);
 
 router.get("/test", (req, res) => {
     res.status(200);

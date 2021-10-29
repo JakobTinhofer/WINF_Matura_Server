@@ -34,7 +34,7 @@ exports.sendStatusEmail = async (rec, status_title, status_message, status_color
             status_message: status_message
         })
     }
-    return await transporter.sendMail(mailOptions);
+    //return await transporter.sendMail(mailOptions);
 }
 
 exports.sendVerificationEmail = async (verification) => {

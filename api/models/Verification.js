@@ -1,6 +1,6 @@
 let mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
-const User = require("./User");
+const User = require("./User").schema;
 let verificationSchema = mongoose.Schema({
   user:{
       type: User,

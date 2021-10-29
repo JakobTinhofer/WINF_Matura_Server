@@ -144,6 +144,7 @@
     function validateInput(input, strict){
         switch (input.type) {
             case "password":
+                input.value = input.value.trim();
                 if(input.value == ""){
                     input.classList.remove("validated-eup");
                     if(strict){
@@ -167,6 +168,7 @@
                 }
                 break;   
             case "text":
+                input.value = input.value.trim();
                 if(input.name == "emailOrUsername"){
                     if(input.value == ""){
                         input.classList.remove("validated-eup");
@@ -270,8 +272,15 @@
             message += 'Invalid email.\n';
         }
 
-
+        if(strict && strict !== 'none'){
+            username = username.trim();
+            password = password.trim();
+            email = email.trim();
+            password2 = password2.trim();
+        }
+        
         signup_classes['username'] = '';
+        
         if(username.length <= 40 && username.length >= 4){
             if(isValidUsername(username)){
                 signup_classes['username'] = 'validated-eup';

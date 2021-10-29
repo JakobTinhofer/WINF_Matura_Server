@@ -98,7 +98,7 @@ exports.trySignUp = async function (username, email, password, password2, callba
         let result = JSON.parse(await res.json());
         console.debug(result);
         if(res.status === 200){
-            return [String(result.title).toLocaleLowerCase() === "successfully registered user.", undefined, undefined];
+            return [String(result.message).toLocaleLowerCase() === "successfully registered user.", undefined, undefined];
         }
         else if(res.status === 400 || res.status === 403){
             return [false,  result.message, result.errorCode];
@@ -114,6 +114,30 @@ exports.trySignUp = async function (username, email, password, password2, callba
     }
 }
 
+exports.tryVerifyAccount = async function (secret, callback){
+    let url = api_url + "/api/users/verify"
+    const u = new URLSearchParams();
+    console.log("Secret: " + secret);
+    u.append("secret", secret);
+    try{
+        let res = await fetch(url, {
+            method: 'POST',
+            body: u
+        });
+        let result = JSON.parse(await res.json());
+        if(res.status === 200){
+            return [true, result.message];
+        }
+        return [false, result.message, result.errorCode];
+    }catch(error){
+        console.log(error);
+        if(callback){
+            callback(error, false);
+        }else{
+            throw error;
+        }
+    }
+}
 
 let cached;
 exports.getOwnUser = async function(allow_cached, callback){
