@@ -8,7 +8,6 @@ exports.display403_specific = (req, res, title, message) => {
 
 exports.putJSONError = (req, res, error) => {
     if(error instanceof Error){
-        console.log("Error code: " + error.errorCode);
         res.status(error.status ?? 400);
         res.json(JSON.stringify(error));
     }
