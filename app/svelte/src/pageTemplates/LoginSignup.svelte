@@ -554,6 +554,10 @@
 
 {/if}
 
+<head>
+    <title>{heading}</title>
+</head>
+
 <div id="main">
     <div id="centred">
         <div class="card box_shadow_light">
