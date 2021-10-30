@@ -5,6 +5,7 @@ const Error = require("../classes/Error");
 const SuccessMessage = require("../classes/SuccessMessage");
 const session = require("express-session");
 const mailer = require("../mail/mailer")
+const helpers = require("../helpers")
 const statusController = require("./statusController");
 const bcrypt = require("bcrypt");
 
@@ -23,79 +24,60 @@ exports.registerUser = async (req, res) => {
         return;
     }
 
-    if(password.length < 6 || password.length > 256){
-        statusController.putJSONError(req, res, new Error("Register Error", "Password must be between 6 and 256 characters long.", 400, 2));
-        console.log("Register User Attempt failed since password was not between 6 and 256 characters.");
+    
+    
+    
+    let rs= helpers.validateEmail(email);
+    if(!rs[0]){
+        statusController.putJSONError(req, res, new Error("Register Error", rs[2], 400, 0));
+        console.log("Register user attempt failed since email invalid: " + rs[2]);
         return;
     }
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(re.test(String(username).toLocaleLowerCase())){
-        statusController.putJSONError(req, res, new Error("Register Error", "Please, do not provide an email as a username. There is an email field for that. ;)", 400, 1));
-        console.log("Register User Attempt failed since some 'fatneek' thought username was where you put your email. Mad.");
-        return;
-    }
-
-    if(!re.test(String(email).toLocaleLowerCase())){
-        statusController.putJSONError(req, res, new Error("Register Error", "Please provide a valid email address.", 400, 0));
-        console.log("Register User Attempt failed since the email was invalid.");
-        return;
-    }
-
-    if(username.length < 4 || username.length > 40){
-        statusController.putJSONError(req, res, new Error("Register Error", "Please choose a user name between 4 and 40 characters long.", 400, 1));
-        console.log("Register User Attempt failed since the username was not between 4 and 40 characters long.");
-        return;
-    }     
-    const invalidChars = /[*|\",\/:<>?[\]{}`\\()';@&$]/
-    if(invalidChars.test(username)){
-        statusController.putJSONError(req, res, new Error("Register Error", "The username can not contain these characters: * | " + '"' + " , / : < > ? [ ] { } ` \\ () ' ; @ & $", 400, 1));
-        console.log("Register User Attempt failed since username contained special chars.");
+    
+    rs = helpers.validatePassword(password)
+    if(!rs[0]){
+        statusController.putJSONError(req, res, new Error("Register Error", rs[2], 400, 2));
+        console.log("Register user attempt failed since password invalid: " + rs[2]);
         return;
     }
 
-    User.find({$or: [{email: email}, {username: username}]}).exec((err, users) =>{
-        if(users && users.length > 0){
-            user = users[0];
-            if(user.email == email){
-                statusController.putJSONError(req, res, new Error("Register Error", "This email is already registered. Maybe try logging in?", 400, 0));
-                
-            }else{
-                statusController.putJSONError(req, res, new Error("Register Error", "This username is already taken. Please try another one.", 400, 1))
-            }
-            console.log("Register User Attempt failed since email or username was not unique.");
-            return;
+    rs = helpers.validateUsername(username);
+    if(!rs[0]){
+        statusController.putJSONError(req, res, new Error("Register Error", rs[2], 400, 1));
+        console.log("Register user attempt failed since username invalid: " + rs[2]);
+        return;
+    }
+
+    
+
+    let uq = await User.find({$or: [{email: email}, {username: username}]});
+
+    if(uq && uq.length > 0){
+        let user = uq[0];
+        if(user.email == email){
+            statusController.putJSONError(req, res, new Error("Register Error", "This email is already registered. Maybe try logging in?", 400, 0));
+            
+        }else{
+            statusController.putJSONError(req, res, new Error("Register Error", "This username is already taken. Please try another one.", 400, 1))
         }
-        const newUser = new User({
-            email: email,
-            username: username,
-            sec_level: 0,
-            password_hash: password,
-            verified: false
-        });
-
-        bcrypt.genSalt(10,(err,salt)=> 
-            bcrypt.hash(newUser.password_hash, salt, (err,hash)=> {
-                if(err){
-                    console.log("Error while trying to hash user password: " + err + "!!!! Register Attempt Failed.");
-                    statusController.putJSONError(req, res, new Error("Register Error", "Internal Error while trying to hash password.", 500));
-                    return;
-                }
-                //save pass to hash
-                newUser.password_hash = hash;
-                //save user
-                newUser.save()
-                .then(async (value)=>{
-                    console.log(value);
-                    await mailer.sendVerificationEmail(await Verification.getOrCreateNew(newUser));
-                    console.log("Sent verification email!");
-                }).catch(value=> console.log(value));
-                      
-            })
-        );
-        console.log("User created successfully!");
-        statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully registered user."));
+        console.log("Register User Attempt failed since email or username was not unique.");
         return;
-    });
+    }    
+    const newUser = new User({
+        email: email,
+        username: username,
+        sec_level: 0,
+        password_hash: password,
+        verified: false
+    });   
+
+    newUser.password_hash = await helpers.hashPassword(password);
+    await newUser.save();
+    await mailer.sendVerificationEmail(await Verification.getOrCreateNew(newUser));
+    console.log("Sent verification email!");
+    console.log("User created successfully!");
+    statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully registered user."));
+    return;
 }
 
 exports.require_login = async (req, res) => {
@@ -105,7 +87,7 @@ exports.require_login = async (req, res) => {
 exports.verify_user = async (req, res) => {
     let {secret} = req.fields ? req.fields: req.query;
 
-    console.log("Trying to verify user with secret " + secret);
+    console.log("Trying to verify user...");
 
     let ver = await Verification.find({secret: secret});
 
@@ -274,3 +256,4 @@ exports.getUserInfo = async (req, res) => {
         return;
     }
 }
+

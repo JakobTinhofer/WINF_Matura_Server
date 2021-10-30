@@ -12,6 +12,7 @@ transporter = nm.createTransport({
 
 console.log("Trying to log into gmail with username winf2021.2022@gmail.com and password " + process.env['GMAIL_PASSWORD']);
 templates.loadTemplate(__dirname + "/templates/verification_message.html", "verification_message");
+templates.loadTemplate(__dirname + "/templates/forgot_password_code.html", "forgot_password_code");
 templates.loadTemplate(__dirname + "/templates/server_status.html", "server_status").then((res) => {
     exports.sendStatusEmail('jak.tinhofer@billrothgymnasium.at',
         'Server Online',
@@ -47,6 +48,21 @@ exports.sendVerificationEmail = async (verification) => {
         html: (await templates.getTemplate("verification_message")).build({
             username: verification.user.username,
             activate_link: link
+        })
+    }
+    return await transporter.sendMail(mailOptions);
+}
+
+exports.sendForgotPasswordCode = async (user, secret) => {
+    let link = process.env['HOSTNAME'] + "/forgotPassword?secret=" + secret;
+    var mailOptions = {
+        from: 'WINF 2021 / 2022',
+        to: user.email,
+        subject: 'Forgot Password?',
+        text: 'The HTML version of this email was unable to load. Please click on the link below in order to change your password. This link is valid for only 5 minutes.\n' + link + "\nDid not request a password change? Please ignore this email.",
+        html: (await templates.getTemplate("forgot_password_code")).build({
+            username: user.username,
+            password_link: link
         })
     }
     return await transporter.sendMail(mailOptions);

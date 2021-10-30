@@ -1,4 +1,5 @@
-const userController = require("../controllers/userController")
+const userController = require("../controllers/userController");
+const forgotPasswordController = require("../controllers/forgotPasswordController");
 const express = require('express');
 const rateLimit = require("express-rate-limit");
 var router = require('express').Router();
@@ -33,6 +34,9 @@ router.post("/check", userController.check_login_status);
 router.post("/userinfo", userController.getUserInfo);
 router.post("/verify", userController.verify_user);
 router.post("/resend_verification", userController.resend_verification);
+
+router.post("/forgotpassword", forgotPasswordController.sendForgotPassword);
+router.post("/changepassword", forgotPasswordController.changePassword);
 
 router.get("/test", (req, res) => {
     res.status(200);

@@ -1,5 +1,6 @@
 let mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
+const helpers = require("../helpers");
 const User = require("./User").schema;
 let verificationSchema = mongoose.Schema({
   user:{
@@ -24,11 +25,9 @@ verificationSchema.static('getOrCreateNew', async (user) => {
         return q[0];
     }
 
-    let salt,secret;
+    let secret;
     do {
-        salt = await bcrypt.genSalt();
-        secret = await bcrypt.hash(process.memoryUsage().heapTotal + process.hrtime()[1] + process.hrtime()[0] + user.username, salt);
-        q = await Verification.find({secret: secret});
+        secret = await helpers.generateNewSecret();
     }while(q && q.length > 0)
 
 
