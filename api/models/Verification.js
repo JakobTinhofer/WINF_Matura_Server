@@ -18,7 +18,7 @@ let verificationSchema = mongoose.Schema({
 });
 
 verificationSchema.static('getOrCreateNew', async (user) => {
-    let q = await Verification.find({user: user});
+    let q = await Verification.find({'user.username': user.username});
     
     if(q && q.length > 0){
         return q[0];

@@ -97,9 +97,11 @@ exports.registerUser = async (req, res) => {
         return;
     });
 }
+
 exports.require_login = async (req, res) => {
 
 }
+
 exports.verify_user = async (req, res) => {
     let {secret} = req.fields ? req.fields: req.query;
 
@@ -135,6 +137,32 @@ exports.verify_user = async (req, res) => {
     verification.save();
     console.log("Successfully verified user!");
 }
+
+exports.resend_verification = async (req, res) => {
+    let {email} = req.fields ? req.fields: req.query;
+
+    console.log("Received resend verification request for user " + email + ".");
+
+    statusController.putJSONSuccess(req, res, new SuccessMessage("Received request."));
+
+    let user = await User.findOne({email: email});
+
+
+    if(!user){
+        console.log("Dropping resend verification request since user does not exist.");
+        return;        
+    }
+
+    if(user.verified){
+        console.log("Dropping resend verification request since user is already verified.");
+        return;
+    }
+
+    let verification = await Verification.getOrCreateNew(user);
+    mailer.sendVerificationEmail(verification);
+    console.log("Resent verification email");
+}
+
 exports.check_login_status = async (req, res) => {
     if(req.session && req.session.authenticated){
         res.json(JSON.stringify({'authenticated' : req.session.authenticated}));
@@ -143,6 +171,7 @@ exports.check_login_status = async (req, res) => {
     }
         
 }
+
 exports.logout_user = async (req, res) => {
     if(!req.session || !req.session.user){
         console.log("Logout attempt failed since already not logged in.");
@@ -154,7 +183,6 @@ exports.logout_user = async (req, res) => {
     statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully logged out."));
 
 }
-
 
 exports.login_user = async (req, res) => {
     if(req.session && req.session.authenticated){

@@ -46,7 +46,6 @@ exports.tryLogIn = async function (uoe, password, rememberMe, callback){
             body: u
         });
         let result = JSON.parse(await res.json());
-        console.debug(result);
         if(res.status === 200){
             cached = result.result;
             return [String(result.message).toLocaleLowerCase() === "login successfull.", undefined];
@@ -71,7 +70,6 @@ exports.logOut = async function (callback){
     try {
         let res = await fetch(url, {method: 'POST'});
         let result = await res.json();
-        console.log(result);
     }catch (error){
         console.log(error);
         if(callback){
@@ -96,7 +94,6 @@ exports.trySignUp = async function (username, email, password, password2, callba
             body: u
         });
         let result = JSON.parse(await res.json());
-        console.debug(result);
         if(res.status === 200){
             return [String(result.message).toLocaleLowerCase() === "successfully registered user.", undefined, undefined];
         }
@@ -117,7 +114,6 @@ exports.trySignUp = async function (username, email, password, password2, callba
 exports.tryVerifyAccount = async function (secret, callback){
     let url = api_url + "/api/users/verify"
     const u = new URLSearchParams();
-    console.log("Secret: " + secret);
     u.append("secret", secret);
     try{
         let res = await fetch(url, {
@@ -141,7 +137,6 @@ exports.tryVerifyAccount = async function (secret, callback){
 
 let cached;
 exports.getOwnUser = async function(allow_cached, callback){
-    console.log("Updating user...");
     if(allow_cached && cached)
         return cached;
     let url = api_url + "/api/users/userinfo"
@@ -150,10 +145,8 @@ exports.getOwnUser = async function(allow_cached, callback){
         let result = JSON.parse(await res.json());
         if(res.status === 200){
             cached = result;
-            console.log("Successfully got user " + result.username + "..");
             return result;
         }
-        console.log("Error: " + res.message);
         return undefined;
     }catch(error){
         console.log(error);
@@ -162,5 +155,21 @@ exports.getOwnUser = async function(allow_cached, callback){
         }else{
             throw error;
         } 
+    }
+}
+
+exports.resendVerificationEmail = async function(email){
+    let url = api_url + "/api/users/resend_verification";
+    const u = new URLSearchParams();
+    u.append("email", email);
+    try{
+        await fetch(url, {method: 'POST', body: u});
+    }catch(error){
+        console.log(error);
+        if(callback){
+            callback(error, false);
+        }else{
+            throw error;
+        }
     }
 }

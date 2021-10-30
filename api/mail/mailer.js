@@ -43,7 +43,7 @@ exports.sendVerificationEmail = async (verification) => {
         from: 'WINF 2021 / 2022',
         to: verification.user.email,
         subject: 'Activate your account',
-        text: 'The HTML version of this email was unable to load. Please activate your account by clicking this link: ' + link,
+        text: 'The HTML version of this email was unable to load. Please activate your account by clicking this link: ' + link + "You did not request this activation? Feel free to just ignore this email.",
         html: (await templates.getTemplate("verification_message")).build({
             username: verification.user.username,
             activate_link: link

@@ -63,16 +63,3 @@ exports.getURLParameters = function (q) {
        urlParams[decode(match[1])] = decode(match[2]);
     return urlParams;
 };
-
-exports.flyTo = (anime, target, duration, easing, x, y, onFinished) => {
-    var rect = target.getBoundingClientRect();
-    console.log("Animation for " + (x - rect.left) + ":" + (y - rect.top));
-    let anim = anime({
-        duration: duration,
-        target: target,
-        translateX: (x - rect.left),
-        translateY: (y - rect.top),
-        easing: easing,
-        complete: (anim) => {console.log("Animation finished."), onFinished(undefined, anim);}
-    });
-};

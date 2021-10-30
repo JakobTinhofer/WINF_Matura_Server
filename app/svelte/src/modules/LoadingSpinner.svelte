@@ -24,8 +24,6 @@ THESE SPINNERS ARE NOT DONE BY ME, BUT RATHER TAKEN FROM https://loading.io/css/
 
     let interval_id;
 
-    console.log(color);
-
     $: set_state(animateColors);
 
     function set_state(state){
