@@ -253,7 +253,6 @@ exports.getUserInfo = async (req, res) => {
     const {username} = req.fields ? req.fields: req.query;
     if(!req.session || req.session.authenticated !== true){
         statusController.putJSONError(req, res, new Error("Get User Info Error", "Please sign in in order to get user info.", 403, 999));
-        console.log("Unauthenticated user tried to get user info.");
         return;
     }
 
