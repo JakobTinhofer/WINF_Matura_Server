@@ -3,6 +3,7 @@
 	import UserPage from "./pageTemplates/UserPage.svelte";
 	import LoginSignup from "./pageTemplates/LoginSignup.svelte";
 	import VerificationWrapper from "./pageTemplates/VerificationWrapper.svelte";
+	import ForgotPassword from "./pageTemplates/ForgotPassword.svelte";
 
 	import anime from "animejs/lib/anime.es.js";
 
@@ -19,7 +20,7 @@
 	
 
 	function startRouting(location){
-		switch (location) {
+		switch (String(location).toLocaleLowerCase()) {
 			case "/login":
 			case "/signup":
 				active_page = LoginSignup;
@@ -32,6 +33,9 @@
 			case "/":
 			case "":
 				active_page = Main;
+				break;
+			case "forgotpassword":
+				active_page = ForgotPassword;
 				break;
 			default:
 				window.addEventListener("load",  () => {
