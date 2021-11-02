@@ -10,7 +10,6 @@
     import {checkLoggedIn, tryLogIn, logOut, trySignUp} from "../../scripts/auth";
 
     import LoadingSpinner from "../modules/LoadingSpinner.svelte";
-    import { afterUpdate, set_svg_attributes } from "svelte/internal";
 
     import anime from 'animejs';
 
@@ -580,7 +579,7 @@
                     </span>
                 </div>
             {:else if display_successfull_signup}
-                <p>Congratulations! You signed up successfully.</p>
+                <p>Congratulations! You signed up successfully. Please check your inbox (especially your spamfolder) for an activation email.</p>
                 <input type="submit" value="Log In" on:click="{logIn}" />
             {:else if isLogin}
                 <form on:change="{validateLoginForm}" on:keyup="{validateLoginFormNotStrict}" on:submit="{submitLoginForm}">

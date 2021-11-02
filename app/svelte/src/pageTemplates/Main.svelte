@@ -97,7 +97,7 @@
             
         </svelte:fragment>
     </Navbar>
-    <h1>Hello, Traveler</h1>
+    <h1>Hello Traveler</h1>
 </div>
 <div id="generelle-infos">
     <h1>Generelle Infos zur Informatikmatura 2021/2022</h1>
