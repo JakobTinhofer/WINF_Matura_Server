@@ -54,7 +54,7 @@ exports.sendVerificationEmail = async (verification) => {
 }
 
 exports.sendForgotPasswordCode = async (user, secret) => {
-    let link = process.env['HOSTNAME'] + "/forgotPassword?secret=" + secret;
+    let link = process.env['HOSTNAME'] + "/changepassword?secret=" + secret;
     var mailOptions = {
         from: 'WINF 2021 / 2022',
         to: user.email,

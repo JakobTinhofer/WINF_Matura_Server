@@ -2,7 +2,7 @@
     import Card from '../modules/Card.svelte';
     import LoadingSpinner from '../modules/LoadingSpinner.svelte';
     import { getURLParameters, isEmail } from '../../scripts/helpers';
-    import {sendForgotPasswordRequest} from '../../scripts/auth';
+    import {sendForgotPasswordRequest, changePassword} from '../../scripts/auth';
 
     let action = "submitEmail";
 
@@ -19,6 +19,8 @@
     if(window.location.pathname === "/changepassword"){
         page = "setPassword";
         action = "submitPasswords";
+        message = "Enter a new password";
+        button_message = "Change Password";
     }
 
 
@@ -35,7 +37,7 @@
     }
 
     function goEnterEmail() {
-        page = "enterEmail";
+        window.location = "/forgotpassword";
     }
 
     async function doAction(){
@@ -46,7 +48,9 @@
                     let res = await sendForgotPasswordRequest(email);
                     if(res[0]){
                         page = "emailBeenSent";
+                        button_message = "Go Login";
                         disableStr = "";
+                        isValid = false;
                     }else{
                         disableStr = "";
                         message = res[1];
@@ -56,9 +60,24 @@
             case "submitPasswords":
                 disableStr = "disabled";
                 if(validatePasswords()){
-                    
+                    let res = await changePassword(urlParams["secret"], password, password2);
+                    if(res[0]){
+                        page = "success";
+                        action = "goLogin";
+                        button_message = "Go Login";
+                        disableStr = "";
+                    }else{
+                        console.debug(res);
+                        if(res[2] === 404 || res[2] === 403){
+                            page = "resendLink";
+                        }
+                        disableStr = "";
+                        message = res[1];
+                    }
                 }
                 break;
+            case "goLogin":
+                window.location = "login";
             default:
                 break;
         }
@@ -180,7 +199,7 @@
     }
 </style>
 
-{#if isValid || action !== 'submit'}
+{#if isValid || (action !== 'submitEmail' && action !== 'submitPasswords')}
 <head>
     <style>
         input[type=submit]{
@@ -194,6 +213,14 @@
 </head>
 {/if}
 
+
+<head>
+    {#if window.location.pathname === "/changepassword"}
+        <title>Change your Password</title>
+    {:else}
+        <title>Forgot your password?</title>
+    {/if}
+</head>
 
 <div id="main">
     <div id="centred">
@@ -217,9 +244,19 @@
                 <input type="password" class="eup" placeholder="Confirm Password" bind:value="{password2}" disabled={disableStr} on:keyup="{validatePasswords}" on:change="{validatePasswords}"/>
                 <input type="submit" value={button_message} on:click="{doAction}" disabled={isValid ? disableStr : 'disabled'}/>
             </Card>
-        {:else if page === "checkingLink"}
-            <h1>Trying to verify your link...</h1>
-            <LoadingSpinner color="royalblue"/>
+        {:else if page === "success"}
+            <Card>
+                <h1>Success! Your password has been changed.</h1>
+                <input type="submit" value={button_message} on:click="{doAction}" disabled={isValid ? disableStr : 'disabled'}/>
+            </Card>
+        
+        {:else if page === "resendLink"}
+            <Card>
+                <h1>{message}</h1>
+                <p on:click="{goEnterEmail}" class="goBack">Resend link</p>
+            </Card>
         {/if}
+
+
     </div>
 </div>

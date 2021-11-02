@@ -34,9 +34,10 @@
 			case "":
 				active_page = Main;
 				break;
-			case "forgotpassword":
+			case "/forgotpassword":
+			case "/changepassword":
 				active_page = ForgotPassword;
-				break;
+				break; 
 			default:
 				window.addEventListener("load",  () => {
 					Array.prototype.forEach.call(document.getElementsByClassName("animated-point"), elem => {

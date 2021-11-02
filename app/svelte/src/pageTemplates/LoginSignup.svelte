@@ -244,7 +244,9 @@
     //#region Signup - Validation
 
 
-
+    function goHome() {
+        window.location = "/";
+    }
 
     
 
@@ -274,9 +276,7 @@
 
         if(strict && strict !== 'none'){
             username = username.trim();
-            password = password.trim();
             email = email.trim();
-            password2 = password2.trim();
         }
         
         signup_classes['username'] = '';
@@ -527,7 +527,12 @@
         background-color: grey !important;
     }
 
-
+    .sign_out{
+        background-color: slateblue !important;
+    }
+    .sign_out:hover{
+        background-color:  royalblue !important;
+    }
 </style>
 
 <head>
@@ -566,7 +571,8 @@
             <p style="border-left: 3px solid {message && message.length > 0 ? "red" : "transparent"}"> {message}</p>
             {#if isAlreadySignedIn}
                 <p>You are already signed in.</p>
-                <input type="submit" value="Sign Out" on:click="{signOut}" />
+                <input type="submit" value="Sign Out" class="sign_out" on:click="{signOut}" />
+                <input type="submit" value="Go Home" on:click="{goHome}" />
             {:else if displaySpinner}
                 <div style="height: 120px">
                     <span style="position: absolute; left: 50%; transform: translateX(-50%);">
@@ -588,7 +594,7 @@
                     </div>
                     <div class="width-80">
                         <a href="signup">Sign up</a>
-                        <a href="signup" style="float: right">Forgot password?</a>
+                        <a href="forgotpassword" style="float: right">Forgot password?</a>
                     </div>
                     <input type="submit" class="box_shadow_light" value="Log In" disabled={__btn_di_str}/>
                 </form>

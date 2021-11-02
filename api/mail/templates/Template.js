@@ -4,11 +4,12 @@ class Template{
     }
 
     build(params){
+        let b = String(this.html);
         for (const p in params) {
             const re = new RegExp("\{" + p + "\}", "gi");
-            this.html = this.html.replace(re, params[p]);
+            b = b.replace(re, params[p]);
         }
-        return this.html;
+        return b;
     }
 };
 

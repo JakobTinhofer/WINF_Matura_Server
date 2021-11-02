@@ -91,7 +91,16 @@ exports.sendForgotPasswordRequest = async function (email){
 }
 
 exports.changePassword = async function (secret, password, password2) {
-    
+    const u = new URLSearchParams();
+    u.append("secret", secret);
+    u.append("password", password);
+    u.append("password2", password2);
+    let r = await sendPostRequest("/api/users/changepassword", u);
+    if(r[1].status === 200){
+        return [true];
+    }else{
+        return [false, r[0].message, r[1].status];
+    }
 }
 
 
