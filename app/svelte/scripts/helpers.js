@@ -23,6 +23,7 @@ exports.isValidUsername = (val) => {
     return !invalidChars.test(val);
 };
 
+
 exports.invalidCharacterMessage = "The username can not contain these characters: * | " + '"' + " , / : < > ? [ ] { } ` \\ () ' ; @ & $";
 
 exports.isEmail = (val) => {

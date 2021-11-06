@@ -4,6 +4,7 @@
 	import LoginSignup from "./pageTemplates/LoginSignup.svelte";
 	import VerificationWrapper from "./pageTemplates/VerificationWrapper.svelte";
 	import ForgotPassword from "./pageTemplates/ForgotPassword.svelte";
+	import CreateOrEditPage from "./pageTemplates/PageStuff/CreateOrEditPage.svelte";
 
 	import anime from "animejs/lib/anime.es.js";
 
@@ -33,6 +34,10 @@
 			case "/":
 			case "":
 				active_page = Main;
+				break;
+			case "/edit":
+			case "/create":
+				active_page = CreateOrEditPage;
 				break;
 			case "/forgotpassword":
 			case "/changepassword":

@@ -8,7 +8,7 @@ const SuccessMessage = require("../classes/SuccessMessage");
 let codes = [];
 
 exports.sendForgotPassword = async (req, res) => {
-    let {email} = Object.keys(req.query).length > 1 ? req.query : req.fields;
+    let {email} = req.query;
     console.log("Forgot password request for email: " + email);
     let rs = helpers.validateEmail(email);
     if(!rs[0]){
@@ -35,7 +35,7 @@ exports.sendForgotPassword = async (req, res) => {
 }
 
 exports.changePassword = async (req, res) => {
-    let {secret, password, password2} = Object.keys(req.query).length > 1 ? req.query : req.fields;
+    let {secret, password, password2} = req.query;
 
     if(!password || !password2 || !secret){
         statusController.putJSONError(req, res, new Error("Change Password Error", "Please fill out all fields!"));

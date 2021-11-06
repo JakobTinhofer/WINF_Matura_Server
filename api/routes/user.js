@@ -2,9 +2,8 @@ const userController = require("../controllers/userController");
 const forgotPasswordController = require("../controllers/forgotPasswordController");
 const express = require('express');
 const rateLimit = require("express-rate-limit");
+const formidable = require("express-formidable");
 var router = require('express').Router();
-
-
 
 if(!process.env["DEV_MODE"]){
     router.use("/login", rateLimit({
@@ -25,6 +24,7 @@ if(!process.env["DEV_MODE"]){
         message: "Too many signup attempts!"
     }));
 }
+
 
 
 router.post("/login", userController.login_user);

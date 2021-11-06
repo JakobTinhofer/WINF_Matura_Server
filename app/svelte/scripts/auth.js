@@ -8,15 +8,16 @@ exports.api_url = api_url;
 
 exports.checkLoggedIn = async function (callback){
     let res = await sendPostRequest("/api/users/check");
-    return res[0].authenticated === true;
+    if(callback){
+        callback(res[0].authenticated === true);
+    }else{
+        return res[0].authenticated === true;
+    }
+    
 }
 
 exports.tryLogIn = async function (uoe, password, rememberMe, callback){
-    const u = new URLSearchParams();
-    u.append("usernameOrEmail", uoe);
-    u.append("password", password);
-    u.append("rememberMe", rememberMe);
-    let res = await sendPostRequest("/api/users/login", u);
+    let res = await sendPostRequest(`/api/users/login?usernameOrEmail=${uoe}&password=${password}&rememberMe=${rememberMe}`); 
     if(res[1].status === 200){
         cached = res[0].result;
         return [String(res[0].message).toLocaleLowerCase() === "login successfull.", undefined];
@@ -33,12 +34,7 @@ exports.logOut = async function (callback){
 }
 
 exports.trySignUp = async function (username, email, password, password2, callback){
-    const u = new URLSearchParams();
-    u.append("email", email);
-    u.append("username", username);
-    u.append("password", password);
-    u.append("password2", password2);
-    let res = await sendPostRequest("/api/users/register", u);
+    let res = await sendPostRequest(`/api/users/register?username=${username}&email=${email}&password=${password}&password2=${password2}`);
     if(res[1].status === 200){
         return [String(res[0].message).toLocaleLowerCase() === "successfully registered user.", undefined, undefined];
     }
@@ -49,9 +45,7 @@ exports.trySignUp = async function (username, email, password, password2, callba
 }
 
 exports.tryVerifyAccount = async function (secret, callback){
-    const u = new URLSearchParams();
-    u.append("secret", secret);
-    let res = await sendPostRequest("/api/users/verify", u);
+    let res = await sendPostRequest("/api/users/verify?secret=" + secret);
     if(res[1].status === 200){
         return [true, res[0].message];
     }
@@ -72,17 +66,12 @@ exports.getOwnUser = async function(allow_cached, callback){
 }
 
 exports.resendVerificationEmail = async function(email){
-    const u = new URLSearchParams();
-    u.append("email", email);
-    let r = await sendPostRequest("/api/users/resend_verification", u);
+    let r = await sendPostRequest("/api/users/resend_verification?email=" + email, u);
 }
 
 
 exports.sendForgotPasswordRequest = async function (email){
-    console.log("Email: " + email);
-    const u = new URLSearchParams();
-    u.append("email", email);
-    let r = await sendPostRequest("/api/users/forgotpassword", u);
+    let r = await sendPostRequest("/api/users/forgotpassword?email=" + email);
     if(r[1].status === 200){
         return [true];
     }else{
@@ -91,11 +80,7 @@ exports.sendForgotPasswordRequest = async function (email){
 }
 
 exports.changePassword = async function (secret, password, password2) {
-    const u = new URLSearchParams();
-    u.append("secret", secret);
-    u.append("password", password);
-    u.append("password2", password2);
-    let r = await sendPostRequest("/api/users/changepassword", u);
+    let r = await sendPostRequest(`/api/users/changepassword?secret=${secret}&password=${password}&password2=${password2}`);
     if(r[1].status === 200){
         return [true];
     }else{
@@ -103,6 +88,21 @@ exports.changePassword = async function (secret, password, password2) {
     }
 }
 
+exports.createNewSite = async function (title, files, isPublic, startPage) {
+    const f = new FormData();
+    f.append("title", title);
+    for(const file of files){
+        f.append(file.name, file);
+    }
+    f.append("isPublic", isPublic);
+    f.append("entryFile", startPage)
+    let r = await sendPostRequest("/api/sites/create", f);
+    if(r[1].status === 200){
+        return [true, r[0].result];
+    }else{
+        return [false, r[0].message, r[0].errorCode];
+    }
+}
 
 async function sendPostRequest(url, body, callback){
     let act_url = api_url + url;

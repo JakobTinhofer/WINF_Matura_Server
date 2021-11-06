@@ -10,7 +10,7 @@ const statusController = require("./statusController");
 const bcrypt = require("bcrypt");
 
 exports.registerUser = async (req, res) => {
-    const {username,email, password, password2} = req.fields ? req.fields: req.query;
+    const {username,email, password, password2} = req.query;
     console.log('Register User Attempt: Username: "' + username+ '"and email: "' + email+ '"');
     if(!username || !email || !password || !password2) {
         statusController.putJSONError(req, res, new Error("Register Error", "Please provide all fields!", 400, -1));
@@ -80,12 +80,24 @@ exports.registerUser = async (req, res) => {
     return;
 }
 
-exports.require_login = async (req, res) => {
+exports.require_login = async (req, res, minSecCode) => {
+    if(req.session.authenticated !== true){
+        statusController.putJSONError(req, res, new Error("Access Denied", "Please login before using this route.", 403, 666));
+        console.log("Route required login, but not logged in!");
+        return false;
+    }
 
+    if(minSecCode !== undefined && req.session.user.sec_level < minSecCode){
+        statusController.putJSONError(req, res, new Error("Access Denied", "Your account does not have the required permissions for this route.", 403, 333));
+        console.log("User Sec Rank not high enough for route.");
+        return false;
+    }
+
+    return true;
 }
 
 exports.verify_user = async (req, res) => {
-    let {secret} = req.fields ? req.fields: req.query;
+    let {secret} = req.query;
 
     console.log("Trying to verify user...");
 
@@ -121,7 +133,7 @@ exports.verify_user = async (req, res) => {
 }
 
 exports.resend_verification = async (req, res) => {
-    let {email} = req.fields ? req.fields: req.query;
+    let {email} = req.query;
 
     console.log("Received resend verification request for user " + email + ".");
 
@@ -173,7 +185,7 @@ exports.login_user = async (req, res) => {
         return;
     }
 
-    const {usernameOrEmail, password, rememberMe} = req.fields ? req.fields: req.query;
+    const {usernameOrEmail, password, rememberMe} = req.query;
     console.log("Login attempt with username/email '" + usernameOrEmail + "' and rememberMe='" + rememberMe + "'.");
 
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -210,7 +222,7 @@ exports.login_user = async (req, res) => {
             if(rememberMe == "true" || rememberMe == "on"){
                 req.session.cookie.maxAge =  1000 * 60 * 60 * 24 * 60 ;
             }
-            statusController.putJSONSuccess(req, res, new SuccessMessage("Login Successfull.", userToUserInfo(user)));
+            statusController.putJSONSuccess(req, res, new SuccessMessage("Login Successfull.", helpers.userToUserInfo(user)));
             return;
         }else{
             console.log("Login attempt with invalid credentials.");
@@ -221,15 +233,7 @@ exports.login_user = async (req, res) => {
     });
 }
 
-function userToUserInfo(user){
-    return {
-        username: user.username,
-        email: user.email,
-        sec_level: user.sec_level,
-        created: user.created,
-        verified: user.verified
-    }
-}
+
 
 exports.getUserInfo = async (req, res) => {
     const {username} = req.fields ? req.fields: req.query;
@@ -246,7 +250,7 @@ exports.getUserInfo = async (req, res) => {
 
     if(username === undefined || username === req.session.user.username){
         
-        res.json(JSON.stringify(userToUserInfo(req.session.user)));
+        res.json(JSON.stringify(helpers.userToUserInfo(req.session.user)));
         return;
     }
 
