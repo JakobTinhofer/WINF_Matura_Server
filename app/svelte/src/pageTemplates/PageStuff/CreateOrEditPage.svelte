@@ -13,7 +13,7 @@ let title_message;
 
 let files;
 let fileList = new Array();
-let isPublic;
+let isPublic = false;
 let startPage;
 let file_upload_message;
 
@@ -97,6 +97,7 @@ let displaySuccessPage = false;
 let redirect = "";
 let submit_message;
 
+
 async function onSubmit(e){
     if (e.preventDefault) e.preventDefault();
 
@@ -108,7 +109,7 @@ async function onSubmit(e){
         }else if(startPage.value === "none"){
             startPage_message = "Please select a valid html file. If there are none, upload some!";
         }else{
-            let r = await createNewSite(title.value, fileList, isPublic.value, fileList[Number(startPage.value)].name);
+            let r = await createNewSite(title.value, fileList, isPublic, fileList[Number(startPage.value)].name);
             if(r[0]){
                 displaySuccessPage = true;
             }else{
@@ -312,12 +313,12 @@ input[type=submit]:disabled:hover{
         </div>
 
         <label for="isPublic" class="checkbox_label">Make this page public</label>
-        <input type="checkbox" disabled={disableInput ? 'disabled' : ''} id="isPublic" bind:this="{isPublic}"/>
+        <input type="checkbox" on:change="{() => {isPublic = !isPublic; console.log(isPublic)}}" disabled={disableInput ? 'disabled' : ''} id="isPublic" bind:value="{isPublic}"/>
         <br>
 
         <label for="start_file" style="margin-top: 50px">Select your start page</label>
         <p class="message" style="border-color: {startPage_message && startPage_message.length > 2 ? "red" : "transparent"};">{startPage_message && startPage_message.length > 2 ? startPage_message : "Select the page you want visitors to visit first!"}</p>
-        <select class="box_shadow_light" disabled={disableInput ? 'disabled' : ''} bind:this="{startPage}" id="start_file" on:change="{validateSelect}">
+        <select class="box_shadow_light"  disabled={disableInput ? 'disabled' : ''} bind:this="{startPage}" id="start_file" on:change="{validateSelect}">
             <option value="none">None Selected</option>
 
             {#each fileList as f, i}

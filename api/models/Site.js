@@ -2,10 +2,10 @@ let mongoose = require("mongoose");
 const User = require("./User").schema;
 let siteSchema = mongoose.Schema({
   author:{
-      type: User,
+      type: Object,
       require: true
   },
-  dir_path:{
+  dir_path_end:{
       type: String,
       require: true
   },

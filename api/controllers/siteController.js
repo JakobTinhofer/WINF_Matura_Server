@@ -6,6 +6,7 @@ const helpers = require("../helpers");
 const statusController = require("./statusController");
 const userController = require("./userController");
 const { request } = require("express");
+const path = require('path');
 const fs = require('fs');
 const { Console } = require("console");
 const formidable = require("formidable");
@@ -15,6 +16,18 @@ const illegalChars = /[^A-z0-9äöü\-_.]/;
 function nameCreator9000(name) {
     console.log("--> Saving file " + name);
     return String(name.replace(illegalChars, "_"));
+}
+
+function siteToSiteInfo(site) {
+    return {
+        author: helpers.userToUserInfo(site.author),
+        dir_path_end: site.dir_path_end,
+        start_file: site.start_file,
+        title: site.title,
+        isPublic: site.isPublic,
+        hex_id: site.hex_id,
+
+    }
 }
 
 exports.createSite  = async (req, res) => {
@@ -96,9 +109,9 @@ exports.createSite  = async (req, res) => {
             
         
         let s = new Site({
-            isPublic: isPublic === 'on',
+            isPublic: isPublic === true ||isPublic === 'true' || isPublic === 'on',
             hex_id: siteId,
-            dir_path: dirPath,
+            dir_path_end: siteId,
             author: helpers.userToUserInfo(req.session.user),
             start_file: entryFile,
             title: title
@@ -115,6 +128,76 @@ exports.createSite  = async (req, res) => {
 }
 
 
-exports.getSiteById = async (req, res) => {
-    console.log("Here")
+exports.getSiteByPath = async (req, res) => {
+    const {pathEnd} = req.query;
+
+    if(!pathEnd || illegalChars.test(pathEnd)){
+        statusController.putJSONError(req, res, new Error("Get Site Error", "Please provide a valid site path", 400, 0));
+        console.log("Could not get site due to invalid path");
+        return;
+    }
+    
+    let s = await Site.findOne({dir_path_end: pathEnd});
+
+    if(s){
+        statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully retrieved site info", siteToSiteInfo(s)));
+        return;
+    }else{
+        statusController.putJSONError(req, res, new Error("Get Site Error", "Could not find any site with this path.", 404, 1));
+        return;
+    }
+    
+}
+
+exports.getSiteContent = async (req, res) => {
+    const reqPath = req.params[0].substring(1);
+
+    if(!reqPath.includes("/") && !reqPath.endsWith("/")){
+        res.redirect(req.baseUrl + "/" + reqPath + "/");
+        return;
+    }
+
+    const sitePath = reqPath.split("/").shift();
+
+    if(!sitePath || illegalChars.test(sitePath)){
+        statusController.putJSONError(req, res, new Error("Get Content Error", "The given path is invalid!", 400, 0));
+        console.log("Could not server site content since path is invalid.");
+        return;
+    }
+
+    let s = await Site.findOne({dir_path_end: sitePath});
+
+    if(s){
+        if(!s.isPublic){
+            if(!await userController.require_login(req, res))
+                return;
+            if(req.session.user.username !== s.author.username){
+                statusController.putJSONError(req, res, new Error("Get Content Error", "This site is private!", 403, 1));
+                console.log("User tried to view private page that is not his.");
+                return;
+            }
+        }
+
+        var combined_path = path.join(process.env['SITE_PATH'], reqPath);
+        if(!combined_path.startsWith(path.join(process.env['SITE_PATH'], s.dir_path_end))){
+            statusController.putJSONError(req, res, new Error("Get Content Error", "You sneaky ****! No path traversals here!", 403, 2));
+            console.log("Someone tried a path traversal! Request path: " + reqPath);
+            return;
+        }
+
+        if(fs.existsSync(combined_path)){
+            if(fs.lstatSync(combined_path).isDirectory()){
+                combined_path = path.join(combined_path, s.start_file);
+            }
+            res.sendFile(combined_path);
+        }else{
+            statusController.putJSONError(req, res, new Error("Get Content Error", "The requested file has not been found.", 404, 3));
+            console.log("Could not serve file as it was not found.");
+            return;
+        }    
+    }else{
+        statusController.putJSONError(req, res, new Error("Get Content Error", "The requested site has not been found.", 404, 4));
+        console.log("Unknown site querried.");
+        return;
+    }
 }
