@@ -39,8 +39,7 @@ bcrypt.hash(process.memoryUsage().heapTotal + "That's mad fam." + process.hrtime
     if(process.env["DEV_MODE"]){
         app.use("/api", require('./api'))
             .use(require('./app'))
-            .listen(3000);
-        process.env['HOSTNAME'] = 'http://localhost:3000';
+            .listen(process.env["PORT"]);
     }else{
         app.use(vhost('api.lightbluefox.xyz', require('./api')))
             .use(vhost("lightbluefox.xyz", require('./app')))
