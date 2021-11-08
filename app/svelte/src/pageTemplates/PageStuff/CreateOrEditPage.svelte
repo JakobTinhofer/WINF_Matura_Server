@@ -11,7 +11,7 @@ let title;
 let title_message;
 
 
-let files;
+let files; 
 let fileList = new Array();
 let isPublic = false;
 let startPage;
@@ -111,6 +111,7 @@ async function onSubmit(e){
         }else{
             let r = await createNewSite(title.value, fileList, isPublic, fileList[Number(startPage.value)].name);
             if(r[0]){
+                redirect = "/api/sites/" + r[1] + "/";
                 displaySuccessPage = true;
             }else{
                 switch(r[2]){
