@@ -1,0 +1,9 @@
+node_modules
+app/svelte/node_modules
+app/svelte/src
+app/svelte/scripts
+app/svelte/package.json
+app/svelte/package-lock.json
+app/svelte/rollup.config.json
+app/svelte/README.md
+.vscode

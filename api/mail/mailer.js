@@ -3,10 +3,22 @@ const Verification = require('../models/Verification');
 var templates = require('./templates');
 
 transporter = nm.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com' ,
+    port: 587,
+    secure: false,
     auth: {
         user: 'winf2021.2022@gmail.com',
         pass: process.env['GMAIL_PASSWORD']
+    }
+});
+
+console.log("Verifying mail server connection!");
+
+transporter.verify(function (error, success) {
+    if (error) {
+        console.log(error);
+    } else {
+        console.log("Connected to mail server.");
     }
 });
 

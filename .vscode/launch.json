@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\index.js",
-            "args": ["--dev", "-s", "D:\\NOSYNC\\WINF_UPLOADS\\sites", ]
+            "args": ["--dev", "-s", "D:\\NOSYNC\\WINF_UPLOADS\\sites", "-p", "FscUqSDHwJH4sNitfWqszi9IOE6yYq3e"]
         }
     ]
 }
