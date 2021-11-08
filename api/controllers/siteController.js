@@ -109,7 +109,7 @@ exports.createSite  = async (req, res) => {
             
         
         let s = new Site({
-            isPublic: isPublic === true ||isPublic === 'true' || isPublic === 'on',
+            isPublic: isPublic === true || isPublic === 'true' || isPublic === 'on',
             hex_id: siteId,
             dir_path_end: siteId,
             author: helpers.userToUserInfo(req.session.user),

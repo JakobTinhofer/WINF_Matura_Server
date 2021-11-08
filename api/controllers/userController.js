@@ -123,7 +123,12 @@ exports.verify_user = async (req, res) => {
 
     statusController.putJSONSuccess(req, res, new SuccessMessage("Account verified!", verification.user));
 
-    let user = await User.findById(verification.user._id);
+    let user = await User.findOne({"user.username": verification.user.username});
+    if(!user){
+        statusController.putJSONError(req, res, new Error("Verification Error", "Internal server error while trying to verify you :(", 500, 999));
+        console.log("FATAL: Could not find user " + verification.user.username + " in database!!!!");
+        return;
+    }
     user.verified = true;
 
     await user.save();

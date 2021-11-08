@@ -94,7 +94,7 @@ $: validateSelect(file_list_valid);
 let disableInput = false;
 
 let displaySuccessPage = false;
-let redirect = "";
+let redirect;
 let submit_message;
 
 
@@ -110,10 +110,11 @@ async function onSubmit(e){
             startPage_message = "Please select a valid html file. If there are none, upload some!";
         }else{
             let r = await createNewSite(title.value, fileList, isPublic, fileList[Number(startPage.value)].name);
-            if(r[0]){
+            console.log(r[1]);
+            if(r[0]){ 
                 redirect = "/api/sites/" + r[1] + "/";
                 displaySuccessPage = true;
-            }else{
+            }else{ 
                 switch(r[2]){
                     case 0:
                         title_valid = false;

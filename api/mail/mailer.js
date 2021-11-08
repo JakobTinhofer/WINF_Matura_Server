@@ -51,7 +51,7 @@ exports.sendStatusEmail = async (rec, status_title, status_message, status_color
 }
 
 exports.sendVerificationEmail = async (verification) => {
-    let link = process.env['HOSTNAME'] + (process.env["PORT"] === 80 ? '' : process.env["PORT"]) + "/verify?secret=" + verification.secret;
+    let link = "http://" + process.env['HOSTNAME'] + (process.env["PORT"] === 80 ? '' : ':' + process.env["PORT"]) + "/verify?secret=" + verification.secret;
     var mailOptions = {
         from: 'WINF 2021 / 2022',
         to: verification.user.email,
@@ -66,7 +66,7 @@ exports.sendVerificationEmail = async (verification) => {
 }
 
 exports.sendForgotPasswordCode = async (user, secret) => {
-    let link = process.env['HOSTNAME'] + (process.env["PORT"] === 80 ? '' : process.env["PORT"]) + "/changepassword?secret=" + secret;
+    let link = "http://" + process.env['HOSTNAME'] + (process.env["PORT"] === 80 ? '' : ':' + process.env["PORT"]) + "/changepassword?secret=" + secret;
     var mailOptions = {
         from: 'WINF 2021 / 2022',
         to: user.email,
