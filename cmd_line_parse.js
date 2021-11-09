@@ -15,7 +15,7 @@ for (let i = 0; i < args.length; i++){
                 process.exit(1);
             }
             break;
-        case "-p":
+        case "-pw":
         case "--gmail-password":
         case "--mail-password":
             if(i + 1 < args.length && !args[i + 1].startsWith("-")){
@@ -66,6 +66,7 @@ for (let i = 0; i < args.length; i++){
                 console.log("Invalid argument! Either the value provided for the port is an argument itsself, or it is not provided!");
                 process.exit(1);
             }
+            break;
         default:
             console.log("Unknown command line parameter: " + args[i]);
             process.exit(1);

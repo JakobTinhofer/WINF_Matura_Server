@@ -66,7 +66,7 @@ exports.getOwnUser = async function(allow_cached, callback){
 }
 
 exports.resendVerificationEmail = async function(email){
-    let r = await sendPostRequest("/api/users/resend_verification?email=" + email, u);
+    let r = await sendPostRequest("/api/users/resend_verification?email=" + email);
 }
 
 
