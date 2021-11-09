@@ -130,11 +130,11 @@ exports.verify_user = async (req, res) => {
         return;
     }
     user.verified = true;
-
+    console.log(user);
     await user.save();
     verification.alreadyVerified = true;
-    verification.save();
-    console.log("Successfully verified user!");
+    await verification.save();
+    console.log("Successfully verified user " + user.username + "!");
 }
 
 exports.resend_verification = async (req, res) => {

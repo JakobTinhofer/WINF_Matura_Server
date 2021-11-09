@@ -207,7 +207,7 @@ input[type=file]{
     display: inline-block;
 }
 
-input[type=submit]{
+input[type=submit], a{
     border: 0px solid transparent;
     padding: 14px;
     font-size: 20px;

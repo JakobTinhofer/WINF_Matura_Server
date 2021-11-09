@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\index.js",
-            "args": ["--dev", "-s", "D:\\NOSYNC\\WINF_UPLOADS\\sites", "-p", "AAAAAAAAAAA"]
+            "args": ["--dev", "-s", "D:\\NOSYNC\\WINF_UPLOADS\\sites", "-pw", "Placeholder password"]
         }
     ]
 }
