@@ -80,10 +80,7 @@ if(!process.env["SITE_PATH"]){
 
 
 
-if(!process.env["GMAIL_PASSWORD"]){
-    console.log("Please add the --gmail-password argument.");
-    process.exit(1);
-}
+
 
 if(!process.env["PORT"]){
     console.log("No port provided or port invalid, assuming 3000.");
