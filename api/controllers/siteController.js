@@ -127,7 +127,6 @@ exports.createSite  = async (req, res) => {
     
 }
 
-
 exports.getSiteByPath = async (req, res) => {
     const {pathEnd} = req.query;
 
@@ -200,4 +199,24 @@ exports.getSiteContent = async (req, res) => {
         console.log("Unknown site querried.");
         return;
     }
+}
+
+exports.getVisibleSitesByFilter = async (req, res) => {
+    const {filter} = req.query;
+
+    if(!await userController.require_login(req, res)){
+        console.log("Couldn't query pages since user not logged in.");
+        return;
+    }
+
+    if(filter){
+        console.log("Filter not yet implemented.");
+        statusController.putJSONError(req, res, new Error("Get Pages Error", "Filters are not yet implemented. Sorry.", 501, -100));
+        return;
+    }
+
+    let pages = await Site.find({ $or: [{"author.username": req.session.user.username}, {isPublic: true}]});
+
+    statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully retrieved sites.", pages));
+    console.log(`User ${req.session.user.username} retrieved ${pages.length} sites.`);
 }

@@ -78,6 +78,7 @@
             <NavbarElement>Generelle Infos</NavbarElement>
             <NavbarElement>Themen</NavbarElement>
             <NavbarElement>Mehr</NavbarElement>
+            <NavbarElement on:click="{() => {window.location = "pages"}}">Pages</NavbarElement>
             {#if loggedIn}
                 <span style="float:right">
                     <Dropdown>
@@ -87,6 +88,7 @@
                         </NavbarElement>
                         <svelte:fragment slot="dropdown-list-elems">
                             <NavbarElement on:click="{logOutClicked}">Log Out</NavbarElement>
+    
                             <NavbarElement>Account info</NavbarElement>
                         </svelte:fragment>
                     </Dropdown>

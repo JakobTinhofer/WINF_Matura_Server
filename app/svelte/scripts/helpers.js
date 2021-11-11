@@ -51,6 +51,10 @@ exports.getNextColor = (anim_id) => {
     return colors[++colorIndexByID[anim_id]];
 };
 
+exports.getRandomColor = () => {  
+    return colors[Math.floor(Math.random() * colors.length - 1)];
+};
+
 //Credit: https://stackoverflow.com/a/2880929/
 exports.getURLParameters = function (q) {
     var match,

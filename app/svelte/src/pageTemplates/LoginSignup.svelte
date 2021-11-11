@@ -97,7 +97,7 @@
                             }));
                             setTimeout(() => {
                                 if(urlParams["redir"])
-                                    window.location.pathname=urlParams["redir"];
+                                    window.location=urlParams["redir"];
                                 else
                                     window.location.pathname="";
                             }, 100);

@@ -81,6 +81,7 @@
         z-index: 1;
         right: 0px !important;
         width: 150%;
+        top: 100%;
     }
 
     .dropdown-content :global(*){

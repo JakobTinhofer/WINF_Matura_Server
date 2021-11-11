@@ -104,20 +104,35 @@ exports.createNewSite = async function (title, files, isPublic, startPage) {
     }
 }
 
-async function sendPostRequest(url, body, callback){
+exports.getSitesWithFilter = async function (filter) {
+    let r;
+    if(filter)
+        r = await sendPostRequest(`/api/sites/getvisible?filter=${filter}`, null, "pages");
+    else
+        r = await sendPostRequest(`/api/sites/getvisible`, null, "pages");
+    if(r[1].status === 200){
+        return [true, r[0].result];
+    }else{
+        return [false, r[0].message, r[0].errorCode]
+    }
+} 
+
+
+async function sendPostRequest(url, body, redirOnNotLoggedIn){
     let act_url = api_url + url;
     try{
         let requestParams = {method: 'POST'}
         if(body)
             requestParams.body = body;
         let res = await fetch(act_url, requestParams);
-        return [JSON.parse(await res.json()), res];
+        let resObj = JSON.parse(await res.json()); 
+        if(res.status === 403 && resObj.errorCode === 666 && redirOnNotLoggedIn !== undefined){
+            window.location = "/login?redir=" + redirOnNotLoggedIn; 
+        }
+
+        return [resObj, res];
     }catch(error){
         console.log(error);
-        if(callback){
-            callback(error, false);
-        }else{
-            throw error;
-        }
+        throw error;
     }
 }

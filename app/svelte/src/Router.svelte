@@ -5,6 +5,7 @@
 	import VerificationWrapper from "./pageTemplates/VerificationWrapper.svelte";
 	import ForgotPassword from "./pageTemplates/ForgotPassword.svelte";
 	import CreateOrEditPage from "./pageTemplates/PageStuff/CreateOrEditPage.svelte";
+	import ViewPages from "./pageTemplates/PageStuff/ViewPages.svelte";
 
 	import anime from "animejs/lib/anime.es.js";
 
@@ -42,7 +43,10 @@
 			case "/forgotpassword":
 			case "/changepassword":
 				active_page = ForgotPassword;
-				break; 
+				break;
+			case "/pages":
+				active_page = ViewPages;
+				break;
 			default:
 				window.addEventListener("load",  () => {
 					Array.prototype.forEach.call(document.getElementsByClassName("animated-point"), elem => {
