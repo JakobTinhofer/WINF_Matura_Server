@@ -37,7 +37,7 @@ getSites();
 }
 
 #menu_bar{
-    padding: 50px;
+    padding: 20px;
 }
 
 #menu_bar a{
@@ -57,7 +57,6 @@ getSites();
 </style>
 
 
-<body style="background-color: #eaeaea;">
     <h1 id="header">
         Sites
     </h1>
@@ -73,5 +72,4 @@ getSites();
         <p id="no_pages_found">No Sites Found.</p>
     {/if}
     </div>
-</body>
 

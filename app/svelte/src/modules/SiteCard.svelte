@@ -24,7 +24,7 @@
         display: inline-block;
         margin: 20px;
         transition: 0.4s;
-        min-width: 400px;
+        width: 80vw;
         background-color: white;
         position: relative;
         border-radius: 15px;
@@ -33,7 +33,7 @@
         box-shadow: 0 1px 2px rgba(0,0,0,0.07), 
                 0 2px 4px rgba(0,0,0,0.07), 
                 0 4px 8px rgba(0,0,0,0.07), 
-                0 8px 16px rgba(0,0,0,0.07),
+                0 8px 16px rgba(0,0,0,0.07), 
                 0 16px 32px rgba(0,0,0,0.07), 
                 0 32px 64px rgba(0,0,0,0.07);
     }
@@ -80,6 +80,8 @@
 
     .title_author{
         display: inline-block;
+        max-width: 60vw;
+        overflow-x: hidden;
     }
 
     .author{
@@ -88,6 +90,7 @@
         display: block;
         margin-left: 3px;
     }
+
 
     .title, .publicOrNot{
         font-family: BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
