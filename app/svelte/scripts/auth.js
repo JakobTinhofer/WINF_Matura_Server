@@ -117,6 +117,23 @@ exports.getSitesWithFilter = async function (filter) {
     }
 } 
 
+exports.checkSiteVisible = async function (pathname) {
+    let r = await fetch(`/api/sites${pathname}`)
+    if(r.status !== 200){
+        return false;
+    }
+    return true;
+}
+
+exports.getSiteByPath = async function (pathname) {
+    let r = await sendPostRequest(`/api/sites/getbypath?pathEnd=${pathname}`);
+    if(r[1].status === 200){
+        return [true, r[0].result];
+    }else{
+        return [false, r[0].message, r[0].errorCode]
+    }
+}
+
 
 async function sendPostRequest(url, body, redirOnNotLoggedIn){
     let act_url = api_url + url;

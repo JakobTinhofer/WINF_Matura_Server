@@ -112,7 +112,7 @@ async function onSubmit(e){
             let r = await createNewSite(title.value, fileList, isPublic, fileList[Number(startPage.value)].name);
             console.log(r[1]);
             if(r[0]){ 
-                redirect = "/api/sites/" + r[1] + "/";
+                redirect = r[1];
                 displaySuccessPage = true;
             }else{ 
                 switch(r[2]){
@@ -285,7 +285,7 @@ input[type=submit]:disabled:hover{
 {#if displaySuccessPage}
     <div id="header">
         <h1>{isEdit ? "Successfully edited page." : "Successfully created page."}</h1>
-        <a href="{redirect}">Go To {redirect}</a>
+        <a href="{redirect}">Go To Site</a>
     </div>
 {:else }
     <div id="header">

@@ -6,7 +6,8 @@
 	import ForgotPassword from "./pageTemplates/ForgotPassword.svelte";
 	import CreateOrEditPage from "./pageTemplates/PageStuff/CreateOrEditPage.svelte";
 	import ViewPages from "./pageTemplates/PageStuff/ViewPages.svelte";
-
+	import SiteViewer from "./pageTemplates/PageStuff/SiteViewer.svelte";
+	import { checkSiteVisible } from "../scripts/auth";
 	import anime from "animejs/lib/anime.es.js";
 
 	let active_page;
@@ -20,6 +21,14 @@
 	let show_home_link = false;
 	let routed = false;
 	
+	let CustomPaths = [];
+
+	export function addCustomPath (path, page){
+		CustomPaths[path] = page;
+	}
+	export function removeCustomPath(path, page) {
+		CustomPaths[path] = null;
+	}
 
 	function startRouting(location){
 		switch (String(location).toLocaleLowerCase()) {
@@ -48,15 +57,7 @@
 				active_page = ViewPages;
 				break;
 			default:
-				window.addEventListener("load",  () => {
-					Array.prototype.forEach.call(document.getElementsByClassName("animated-point"), elem => {
-						elem.style.visibility  = "hidden";
-					});
-					title = "404: Page not found!";
-					msg_color = "lightblue";
-					subtitle = "Could not locate Page '" + location + "'. Did you misspell the url?";
-					show_home_link = true;
-				});
+				handleUnknown(location);
 				break;	
 		}
 		routed = true;
@@ -69,6 +70,29 @@
 				clearInterval(animId);
 				animId = -1;
 			}
+		});
+	}
+
+
+	async function handleUnknown(location){
+		if(CustomPaths[location] !== undefined){
+			active_page = CustomPaths[location];
+			return;
+		}
+
+		if(await checkSiteVisible(location)){
+			active_page = SiteViewer;
+			return;
+		}
+
+		window.addEventListener("load",  () => {
+			Array.prototype.forEach.call(document.getElementsByClassName("animated-point"), elem => {
+				elem.style.visibility  = "hidden";
+			});
+			title = "404: Page not found!";
+			msg_color = "lightblue";
+			subtitle = "Could not locate Page '" + location + "'. Did you misspell the url?";
+			show_home_link = true;
 		});
 	}
 

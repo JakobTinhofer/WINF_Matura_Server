@@ -9,6 +9,10 @@
     export let collapse_on_overflow = true;
     export let minimum_distance = 50;
 
+    export let basic_bg_color = "transparent";
+
+    export let sidebar_width = "60vw";
+
     let navbar;
     let hidden_elems;
     let slotObject;
@@ -144,8 +148,8 @@
         
         <span bind:this="{slotObject}" id="slotObject">
             <span bind:this={hidden_elems}  id="hidden_elems" style="visibility: {hidden_elem_display}; position: {hidden_elem_position}; width: auto; display: inline-block;">
-                <Sidebar bind:isOpened={isBurgerMenuOpen} transparentOverlay="{true}"><span id="sidebar_content"/></Sidebar>
-                <NavbarElement on:click="{expandBurgerMenu}"><i class="fas fa-bars"></i></NavbarElement>
+                <Sidebar barWidth={sidebar_width} bind:isOpened={isBurgerMenuOpen} transparentOverlay="{true}"><span id="sidebar_content"/></Sidebar>
+                <NavbarElement bg_color="{basic_bg_color}" on:click="{expandBurgerMenu}"><i class="fas fa-bars"></i></NavbarElement>
             </span>
             <slot />
         </span>

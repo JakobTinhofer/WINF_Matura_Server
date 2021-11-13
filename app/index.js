@@ -16,6 +16,23 @@ app.get("/test", (req, res) => {
 });
 
 app.get("*", (req, res) => {
+    let reqPath = req.path;
+
+    if(reqPath.endsWith("/resources/global.css")){
+        res.sendFile('./svelte/public/resources/global.css', {root: path.join(__dirname)});
+        return;
+    }
+
+    if(reqPath.endsWith("/build/bundle.js")){
+        res.sendFile('./svelte/build/bundle.js', {root: path.join(__dirname)});
+        return;
+    }
+
+    if(reqPath.endsWith("/build/bundle.css")){
+        res.sendFile('./svelte/build/bundle.css', {root: path.join(__dirname)});
+        return;
+    }
+
     res.sendFile("./svelte/public/index.html", {root: path.join(__dirname)});
 });
 

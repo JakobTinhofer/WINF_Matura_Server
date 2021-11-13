@@ -103,7 +103,7 @@
 
 
 <div class="box_shadow_light card">
-    <div class="img" on:click="{() => { window.location = "/api/sites/" + Site.dir_path_end + "/"}}" style="{do_random_bg ? 'background-color:' + getRandomColor() : ''}"></div>
+    <div class="img" on:click="{() => { window.location = "/" + Site.dir_path_end + "/"}}" style="{do_random_bg ? 'background-color:' + getRandomColor() : ''}"></div>
     
     <div class="menu-bar">
         <div class="title_author">

@@ -156,6 +156,21 @@ exports.getSiteContent = async (req, res) => {
         return;
     }
 
+    if(reqPath.endsWith("/resources/global.css")){
+        res.sendFile('../../app/svelte/public/resources/global.css', {root: path.join(__dirname)});
+        return;
+    }
+
+    if(reqPath.endsWith("/build/bundle.js")){
+        res.sendFile('../../app/svelte/build/bundle.js', {root: path.join(__dirname)});
+        return;
+    }
+
+    if(reqPath.endsWith("/build/bundle.css")){
+        res.sendFile('../../app/svelte/build/bundle.css', {root: path.join(__dirname)});
+        return;
+    }
+
     const sitePath = reqPath.split("/").shift();
 
     if(!sitePath || illegalChars.test(sitePath)){
