@@ -6,8 +6,8 @@ exports.api_url = api_url;
 
 
 
-exports.checkLoggedIn = async function (callback){
-    let res = await sendPostRequest("/api/users/check");
+exports.checkLoggedIn = async function (callback, redir = undefined){
+    let res = await sendPostRequest("/api/users/check", undefined, redir);
     if(callback){
         callback(res[0].authenticated === true);
     }else{
@@ -134,6 +134,23 @@ exports.getSiteByPath = async function (pathname) {
     }
 }
 
+exports.getEditFields = async function (id) {
+    let r = await sendPostRequest(`/api/sites/geteditfields?id=${id}`, null, "pages");
+    if(r[1].status === 200){
+        return [true, r[0].result];
+    }else{
+        return [false, r[0].message, r[0].errorCode];
+    }
+}
+
+exports.sendEditRequest = async function(id, title, additional_files, files_to_remove, start_page, isPublic){
+    let r = await sendPostRequest(`/api/sites/editsite?id=${id}&title=${title}&additional_files=${additional_files}&files_to_remove=${files_to_remove}&start_page=${start_page}&isPublic=${isPublic}`);
+    if(r[1].status === 200){
+        return [true, r[0].result];
+    }else{
+        return [false, r[0].message, r[0].errorCode];
+    }
+}
 
 async function sendPostRequest(url, body, redirOnNotLoggedIn){
     let act_url = api_url + url;

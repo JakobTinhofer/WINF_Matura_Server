@@ -38,9 +38,9 @@ iframe{
 </style>
 
 
-<head>
+<svelte:head>
     <title>{siteTitle}</title>
-</head>
+</svelte:head>
 <div>
     <iframe src="{path}" title="site"/>
 </div>

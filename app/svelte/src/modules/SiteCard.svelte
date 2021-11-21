@@ -119,7 +119,7 @@
                 <Dropdown dd_color_on_open="transparent">
                     <i class="fas fa-ellipsis-v"></i>
                     <svelte:fragment slot="dropdown-list-elems">
-                        <NavbarElement>Edit</NavbarElement>
+                        <NavbarElement on:click="{window.location= "edit?id=" + Site.hex_id}">Edit</NavbarElement>
                         <NavbarElement>Delete</NavbarElement>
                     </svelte:fragment>
                 </Dropdown>

@@ -214,13 +214,13 @@
 {/if}
 
 
-<head>
+<svelte:head>
     {#if window.location.pathname === "/changepassword"}
         <title>Change your Password</title>
     {:else}
         <title>Forgot your password?</title>
     {/if}
-</head>
+</svelte:head>
 
 <div id="main">
     <div id="centred">

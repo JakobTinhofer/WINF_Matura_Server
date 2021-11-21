@@ -59,6 +59,13 @@
         color:darkred;
     }
 
+    .already_uploaded{
+        background-color: purple;
+    }
+
+    .already_uploaded:hover{
+        background-color: rebeccapurple;
+    }
 </style>
 
 <div class="{clss}">

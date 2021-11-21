@@ -26,11 +26,6 @@
 </style>
 
 
-<head>
-    <style>
-
-    </style>
-</head>
 
 <div style="font-size: {fs}; {bg_color !== "rgba(0, 0, 0, 0)" ? "background-color: " + bg_color : ''}; float: {float}" on:click>
     <slot/>

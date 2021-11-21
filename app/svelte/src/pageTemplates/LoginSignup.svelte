@@ -558,9 +558,9 @@
 
 {/if}
 
-<head>
+<svelte:head>
     <title>{heading}</title>
-</head>
+</svelte:head>
 
 <div id="main">
     <div id="centred">

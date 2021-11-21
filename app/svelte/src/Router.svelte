@@ -1,6 +1,5 @@
 <script>
 	import Main from "./pageTemplates/Main.svelte";
-	import UserPage from "./pageTemplates/UserPage.svelte";
 	import LoginSignup from "./pageTemplates/LoginSignup.svelte";
 	import VerificationWrapper from "./pageTemplates/VerificationWrapper.svelte";
 	import ForgotPassword from "./pageTemplates/ForgotPassword.svelte";
@@ -163,7 +162,11 @@
 	}
 
 </style>
-
+<svelte:head>
+	{#if active_page}
+		<title>{title}</title>
+	{/if}
+</svelte:head>
 {#if active_page}
 	<svelte:component this={ active_page }/>
 	{#if animId != -1}
@@ -172,9 +175,7 @@
 		</script>
 	{/if}
 {:else}
-		<head>
-			<title>{title}</title>
-		</head>
+		
 		<body>
 			<div>
 				<h1 style="color: {msg_color}">{title} {@html pointsHTML}</h1>

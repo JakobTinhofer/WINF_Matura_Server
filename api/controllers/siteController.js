@@ -77,9 +77,9 @@ exports.createSite  = async (req, res) => {
         console.log(`Creating site '${title}'. IsPublic: ${isPublic} and Entry: ${entryFile}.'`);
         
 
-        if(!title || isPublic === undefined){
-            statusController.putJSONError(req, res, new Error("Create Site Error", "Please provide all fields.", 400, 0));
-            console.log("Could not create new site since one of the fields was not provided.");
+        if(!title || title.length < 2 || title.length > 40){
+            statusController.putJSONError(req, res, new Error("Create Site Error", "The title you provided was invalid. Please provide a title of length between 5 and 40 characters.", 400, 0));
+            console.log("Invalid title.");
             return;
         }
 
@@ -234,4 +234,172 @@ exports.getVisibleSitesByFilter = async (req, res) => {
 
     statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully retrieved sites.", pages));
     console.log(`User ${req.session.user.username} retrieved ${pages.length} sites.`);
+}
+
+
+exports.getEditFields = async (req, res) => {
+    const {id} = req.query;
+
+    if(!await userController.require_login(req, res)){
+        console.log("Could not return edit fields since user not logged in.");
+        return;
+    }
+
+    let s = await Site.findOne(({hex_id: id}));
+
+    if(s){
+        if(s.author.username !== req.session.user.username && req.session.user.sec_level < 8){
+            console.log("Could not return edit fields since user is not authorized to edit this site!");
+            statusController.putJSONError(req, res, new Error("Get Edit Fields Error", "You are not autorized to edit this site!", 403, 0));
+            return;
+        }
+        let dirPath = process.env['SITE_PATH'] + "/" + s.dir_path_end;
+        if(!fs.existsSync(dirPath)){
+            console.log("Could not return edit fields since directory does not exist!");
+            statusController.putJSONError(req, res, new Error("Get Edit Fields Error", "Somehow this page disappeared. Sorry mate!", 404, 2));
+            return;
+        }
+        fs.readdir(dirPath, (err, files) => {
+            if(err) { console.log("Error: " + err); return; }
+
+            let fields = {
+                "title": s.title,
+                "files": files,
+                "isPublic" : s.isPublic,
+                "start_file": s.start_file
+            }
+
+            statusController.putJSONSuccess(req, res, new SuccessMessage("Retrieved Site Fields", fields));
+        });
+
+    }else{
+        statusController.putJSONError(req, res, new Error("Get Edit Fields Error", "This site has not been found!", 404, 1));
+        console.log("Could not get edit fields since site was not found!");
+        return;
+    }
+}
+
+exports.editSite = async (req, res) => {
+    const { id, title, additional_files, files_to_remove, start_page, isPublic } = req.query;
+
+    if(!await userController.require_login(req, res)){
+        console.log("Could not return edit fields since user not logged in.");
+        return;
+    }
+
+    if(!id){
+        console.log("No site id provided for edit.");
+        statusController.putJSONError(req, res, new Error("Edit Site Error", "No site id was provided."));
+        return;
+    }
+
+    if(!title || title.length < 2 || title.length > 40){
+        statusController.putJSONError(req, res, new Error("Edit Site Error", "The title you provided was invalid. Please provide a title of length between 5 and 40 characters.", 400, 0));
+        console.log("Invalid title.");
+        return;
+    }
+
+    if(entryFile === undefined){
+        statusController.putJSONError(req, res, new Error("Edit Site Error", "Please provide the entry file", 400, 2));
+        console.log("No entry file provided.");
+        return;
+    }
+
+
+    let s = await Site.findOne(({hex_id: id}));
+
+    if(s){
+        if(s.author.username !== req.session.user.username && req.session.user.sec_level < 10){
+            statusController.putJSONError(req, res, new Error("Edit Site Error", "You are not allowed to do this!", 403, 99));
+            console.log(`User ${req.session.user.username} tried to edit the page of another user!`);
+            return;
+        }
+        let dirPath = process.env['SITE_PATH'] + "/" + id;
+
+
+
+        if(!fs.existsSync(dirPath)){
+            statusController.putJSONError(req, res, new Error("Edit Site Error", "Somehow, your site got lost. We are sorry. :(", 500, 123));
+            console.log("Fatal Error: Cannot find site on disk, but it is in DB! Site id: " + s.id);
+            return;
+        }
+
+        if(files_to_remove){
+            for(ftr in files_to_remove){
+                p = path.normalize(dirPath + "/" + ftr)
+                if(!p.startsWith(dirPath)){
+                    statusController.putJSONError(req, res, new Error("Edit Site Error", "No path traversal here, carry on!", 403, 11231));
+                    console.log(`Detected path traversal attempt by user ${req.session.user.username}! Tried to remove ${p}.`);
+                    return;
+                }
+                if(!fs.existsSync(p) || fs.lstatSync(path_string).isDirectory()){
+                    statusController.putJSONError(req, res, new Error("Edit Site Error", `The file ${ftr} does either not exist, or it is a directory! No changes have been made.`));
+                    console.log("File to remove does not exist or is directory.");
+                    return;
+                }
+            }
+
+            for(ftr in files_to_remove){
+                fs.rmSync(dirPath + "/" + ftr);
+                console.log("Removed file " + ftr);
+                return;
+            }
+        }
+
+        
+        let remFiles = fs.readdirSync(dirPath);
+        
+
+        const form = formidable({
+            keepExtensions: true,
+            uploadDir: dirPath,
+        });  
+
+        form.on('file', function(field, file) {
+            p = path.normalize( form.uploadDir + "/" + nameCreator9000(file.name))
+            if(fs.existsSync(p)){
+                if(!fs.lstatSync(p).isDirectory()){
+                    fs.rmSync(p)
+                    console.log("Overwrote file " + file.name);
+                }else{
+                    console.log("Could not upload file " + file.name + " since there is a directory of the same name!");
+                    return;
+                }
+            }
+            fs.rename(file.path, form.uploadDir + "/" + nameCreator9000(file.name), ()=> {});
+        });
+
+        form.parse(req, (err, fields, files) => {
+            if(err){
+                console.log("Error while parsing form: " + err);
+                statusController.putJSONError(req, res, new Error("Create Site Error", "Error while parsing form", 400));
+                return;
+            }
+
+            console.log(`Editing site '${title}'. IsPublic: ${isPublic} and Entry: ${entryFile}.'`);
+
+
+        
+            if((!files || files.length === 0) && remFiles.length === 0){
+                statusController.putJSONError(req, res, new Error("Edit Site Error", "This site needs atleast one file.", 400, 3));
+                console.log("No files provided, but all files of site deleted.");
+                return;
+            }
+
+            if(!files[entryFile] && !remFiles.includes(start_page)){
+                statusController.putJSONError(req, res, new Error("Edit Site Error", "Invalid entry file.", 400, 4));
+                console.log("Invalid entry file.");
+                return;
+            }
+
+            s.isPublic = isPublic;
+            s.start_file = start_page;
+            s.title = title;
+            
+            s.save();
+
+            console.log("Successfully edited site  " + id  + ".");
+            statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully edited new site", id));
+        });
+    }
 }
