@@ -8,6 +8,7 @@
 	import SiteViewer from "./pageTemplates/PageStuff/SiteViewer.svelte";
 	import { checkSiteVisible } from "../scripts/auth";
 	import anime from "animejs/lib/anime.es.js";
+	import ModalTest from "./pageTemplates/ModalTest.svelte";
 
 	let active_page;
 	export let maxDots = 3;
@@ -54,6 +55,9 @@
 				break;
 			case "/pages":
 				active_page = ViewPages;
+				break;
+			case "/smtest":
+				active_page = ModalTest;
 				break;
 			default:
 				handleUnknown(location);

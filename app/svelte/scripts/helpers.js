@@ -17,6 +17,9 @@ exports.convertToBool = (val) => {
     throw "Value cannot be converted. Sorry.";
 };
 
+exports.getRandomID = () => {
+  return String(Math.floor(Math.random() * 999999999));
+}
 
 exports.isValidUsername = (val) => {
     const invalidChars = /[*|\",\/:<>?[\]{}`\\()';@&$]/;
