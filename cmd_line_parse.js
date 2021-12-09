@@ -1,3 +1,7 @@
+const fs = require('fs');
+const path = require('path');
+const { exit } = require('process');
+require("dotenv").config();
 var args = process.argv.slice(2);
 
 for (let i = 0; i < args.length; i++){
@@ -38,10 +42,14 @@ for (let i = 0; i < args.length; i++){
         case "-s":
             if(i + 1 < args.length && !args[i + 1].startsWith("-")){
                 process.env["SITE_PATH"] = args[i + 1];
+                if(!fs.existsSync(process.env["SITE_PATH"])){
+                    console.log("Site path '" + process.env["SITE_PATH"] + "' does not exist! Exiting now...");
+                    exit(-555);
+                }
                 i++;
             }
             else{
-                console.log("Invalid argument! Either the value provided for mongo ip is an argument itsself, or it is not provided!");
+                console.log("Invalid argument! Either the value provided for site path is an argument itsself, or it is not provided!");
                 process.exit(1);
             }
             break;
@@ -78,9 +86,14 @@ if(!process.env["SITE_PATH"]){
     process.exit(1);
 }
 
+if(!process.env["GMAIL_PASSWORD"]){
+    console.log("No gmail password was passed.");
+    process.exit(1);
+}
 
-
-
+if(process.env["DEV_MODE"] === "true"){
+    process.env["DEV_MODE"] = true;
+}
 
 if(!process.env["PORT"]){
     console.log("No port provided or port invalid, assuming 3000.");
