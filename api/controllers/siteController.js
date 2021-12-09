@@ -44,7 +44,7 @@ exports.createSite  = async (req, res) => {
         siteCheck = await Site.find({hex_id: siteId});
     }while(siteCheck && siteCheck.length !== 0)
     
-    let dirPath = process.env['SITE_PATH'] + "/" + siteId;
+    let dirPath = path.normalize(process.env['SITE_PATH'] + "/" + siteId);
 
     
 
@@ -66,6 +66,7 @@ exports.createSite  = async (req, res) => {
     });
 
     form.parse(req, (err, fields, files) => {
+        console.log(fields);
         let {title, isPublic, entryFile} = fields;
 
         if(err){
@@ -171,7 +172,9 @@ exports.getSiteContent = async (req, res) => {
         return;
     }
 
-    const sitePath = reqPath.split("/").shift();
+    const remPath = reqPath.split("/");
+    const sitePath = remPath.shift();
+    const remPathStr = remPath.join("/");
 
     if(!sitePath || illegalChars.test(sitePath)){
         statusController.putJSONError(req, res, new Error("Get Content Error", "The given path is invalid!", 400, 0));
@@ -192,8 +195,8 @@ exports.getSiteContent = async (req, res) => {
             }
         }
 
-        var combined_path = path.join(process.env['SITE_PATH'], reqPath);
-        if(!combined_path.startsWith(path.join(process.env['SITE_PATH'], s.dir_path_end))){
+        var combined_path = path.join(path.join(process.env['SITE_PATH'], s.hex_id), remPathStr);
+        if(!combined_path.startsWith(path.join(process.env['SITE_PATH'], s.hex_id))){
             statusController.putJSONError(req, res, new Error("Get Content Error", "You sneaky ****! No path traversals here!", 403, 2));
             console.log("Someone tried a path traversal! Request path: " + reqPath);
             return;
@@ -236,7 +239,6 @@ exports.getVisibleSitesByFilter = async (req, res) => {
     console.log(`User ${req.session.user.username} retrieved ${pages.length} sites.`);
 }
 
-
 exports.getEditFields = async (req, res) => {
     const {id} = req.query;
 
@@ -253,7 +255,7 @@ exports.getEditFields = async (req, res) => {
             statusController.putJSONError(req, res, new Error("Get Edit Fields Error", "You are not autorized to edit this site!", 403, 0));
             return;
         }
-        let dirPath = process.env['SITE_PATH'] + "/" + s.dir_path_end;
+        let dirPath = process.env['SITE_PATH'] + "/" + s.hex_id;
         if(!fs.existsSync(dirPath)){
             console.log("Could not return edit fields since directory does not exist!");
             statusController.putJSONError(req, res, new Error("Get Edit Fields Error", "Somehow this page disappeared. Sorry mate!", 404, 2));
@@ -281,10 +283,12 @@ exports.getEditFields = async (req, res) => {
 }
 
 exports.editSite = async (req, res) => {
-    const { id, title, additional_files, files_to_remove, start_page, isPublic } = req.query;
-
+    const { id, title, isPublic, entryFile } = req.query;
+    let files_to_remove = req.query["files_to_remove"].split(",");
+    if(files_to_remove.length === 1 && files_to_remove[1] ==="")
+        files_to_remove = [];
     if(!await userController.require_login(req, res)){
-        console.log("Could not return edit fields since user not logged in.");
+        console.log("Could not edit site since user not logged in.");
         return;
     }
 
@@ -315,7 +319,7 @@ exports.editSite = async (req, res) => {
             console.log(`User ${req.session.user.username} tried to edit the page of another user!`);
             return;
         }
-        let dirPath = process.env['SITE_PATH'] + "/" + id;
+        let dirPath = process.env['SITE_PATH'] + "/" + s.hex_id;
 
 
 
@@ -324,32 +328,33 @@ exports.editSite = async (req, res) => {
             console.log("Fatal Error: Cannot find site on disk, but it is in DB! Site id: " + s.id);
             return;
         }
-
+        let remFiles = fs.readdirSync(dirPath);
         if(files_to_remove){
-            for(ftr in files_to_remove){
+            for(const ftr of files_to_remove){
+                if(ftr === "")
+                    continue;
                 p = path.normalize(dirPath + "/" + ftr)
-                if(!p.startsWith(dirPath)){
-                    statusController.putJSONError(req, res, new Error("Edit Site Error", "No path traversal here, carry on!", 403, 11231));
+                if(!p.startsWith(path.normalize(dirPath))){
+                    statusController.putJSONError(req, res, new Error("Edit Site Error", "No path traversal here!", 403, 11231));
                     console.log(`Detected path traversal attempt by user ${req.session.user.username}! Tried to remove ${p}.`);
                     return;
                 }
-                if(!fs.existsSync(p) || fs.lstatSync(path_string).isDirectory()){
+                if(!fs.existsSync(p) || fs.lstatSync(p).isDirectory()){
                     statusController.putJSONError(req, res, new Error("Edit Site Error", `The file ${ftr} does either not exist, or it is a directory! No changes have been made.`));
                     console.log("File to remove does not exist or is directory.");
                     return;
                 }
+                let i = remFiles.indexOf(ftr);
+                if(i >= 0)
+                    remFiles.splice(i, 1);
             }
 
-            for(ftr in files_to_remove){
-                fs.rmSync(dirPath + "/" + ftr);
-                console.log("Removed file " + ftr);
-                return;
-            }
         }
 
         
-        let remFiles = fs.readdirSync(dirPath);
         
+        
+        let files_to_rename = []
 
         const form = formidable({
             keepExtensions: true,
@@ -360,14 +365,15 @@ exports.editSite = async (req, res) => {
             p = path.normalize( form.uploadDir + "/" + nameCreator9000(file.name))
             if(fs.existsSync(p)){
                 if(!fs.lstatSync(p).isDirectory()){
-                    fs.rmSync(p)
-                    console.log("Overwrote file " + file.name);
+                    files_to_remove[files_to_remove.length] = p.replace(form.uploadDir + "/", "");
+                    console.log("Overwriting file " + file.name);
                 }else{
                     console.log("Could not upload file " + file.name + " since there is a directory of the same name!");
                     return;
                 }
             }
-            fs.rename(file.path, form.uploadDir + "/" + nameCreator9000(file.name), ()=> {});
+            console.log("Received file " + file.name)
+            files_to_rename[files_to_rename.length] = ([file.path, form.uploadDir + "/" + nameCreator9000(file.name)]);
         });
 
         form.parse(req, (err, fields, files) => {
@@ -381,20 +387,32 @@ exports.editSite = async (req, res) => {
 
 
         
-            if((!files || files.length === 0) && remFiles.length === 0){
+            if(!files && remFiles.length === 0){
                 statusController.putJSONError(req, res, new Error("Edit Site Error", "This site needs atleast one file.", 400, 3));
                 console.log("No files provided, but all files of site deleted.");
                 return;
             }
 
-            if(!files[entryFile] && !remFiles.includes(start_page)){
+            if(!files[entryFile] && !remFiles.includes(entryFile)){
                 statusController.putJSONError(req, res, new Error("Edit Site Error", "Invalid entry file.", 400, 4));
                 console.log("Invalid entry file.");
                 return;
             }
 
+            for(const ftr of files_to_remove){
+                if(ftr === "")
+                    continue;
+                fs.rm(dirPath + "/" + ftr, () => {});
+                console.log("Removed file " + ftr);
+            }
+
+            for(const f2rn of files_to_rename){
+                fs.rename(f2rn[0], f2rn[1], () => {});
+                console.log("mv'd file " + f2rn[0] + " to " + f2rn[1]);
+            }
+
             s.isPublic = isPublic;
-            s.start_file = start_page;
+            s.start_file = entryFile;
             s.title = title;
             
             s.save();
@@ -403,4 +421,77 @@ exports.editSite = async (req, res) => {
             statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully edited new site", id));
         });
     }
+
+
+}
+
+exports.deleteSite = async (req, res) => {
+    const {id} = req.query;
+
+    if(!await userController.require_login(req, res))
+            return;
+
+    let s = await Site.findOne({hex_id: id});
+    
+    if(s){
+        if(s.author.username === req.session.user.username || req.session.user.sec_level >= 10){
+            let dirPath = path.normalize(process.env['SITE_PATH'] + "/" + id);
+            if(!dirPath.startsWith(path.normalize(process.env['SITE_PATH'] + "/" + id))){
+                console.log("Id of page " + id + " seems to trigger a path traversal! How?!?!");
+                statusController.putJSONError(req, res, new Error("Delete Site Error", "Sorry, we cannot delete the site due to an internal error.", 500));
+                return;
+            }
+            if(fs.existsSync(dirPath)){
+                fs.rmdirSync(dirPath, {recursive: true, force: true});
+                console.log("Removed site at " + dirPath);
+            }else{
+                console.log("Error: Path to remove does not exist!!!!!! Still removing site from DB.");
+            }
+            await Site.findOneAndDelete({hex_id: id});
+            statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully deleted site!"));
+            return;
+        }else{
+            console.log("User " + req.session.user.username + " tried to delete site he was not allowed to delete!")
+        }
+    }else
+        console.log("User tried to delete unknown site!");
+
+    
+    statusController.putJSONError(req, res, new Error("Delete Site Error", "Either this site does not exist, or you don't have the permission to delete it!", 400));
+
+}
+
+exports.setCustomPath = async (req, res) => {
+    const {id, customPath} = req.query;
+
+    if(!await userController.require_login(req, res)){
+        console.log("Could not set custom path since user not logged in.");
+        return;
+    }
+
+    const check = helpers.validateCustomPath(customPath);
+    if(!check[0]){
+        console.log("Could not change path since path is invalid!");
+        statusController.putJSONError(req, res, new Error("Set Custom Path Error", "Sorry, your path is invalid: " + check[2], 400, 0));
+        return;
+    }
+
+    var s = await Site.findOne({hex_id: id});
+    if(s){
+        if(s.author.username === req.session.user.username || req.session.sec_level >= 10){
+            const s2 = await Site.findOne({dir_path_end: customPath});
+            if(s2){
+                console.log("Could not change path since path is already taken!");
+                statusController.putJSONError(req, res, new Error("Set Custom Path Error", "Sorry, this path is already taken.", 400, 1));
+                return;
+            }
+            s.dir_path_end = customPath;
+            s.save();
+            statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully updated custom path"));
+            console.log("Updated custom path");
+            return;
+        }
+    }
+    statusController.putJSONError(req, res, new Error("Set Custom Path Error", "Sorry, either this site does not exist, or you are not allowed to access it!"));
+    console.log("Could not update custom path since not found or not required permissions.");
 }

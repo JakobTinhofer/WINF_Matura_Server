@@ -58,3 +58,18 @@ exports.validateEmail =  (email) => {
     }
     return [true];
 }
+const illegalPaths = ["login", "signup", "security", "admin", "createsite", "deletesite", "addsite", "recover"];
+
+const pathUnsaveChars = /[^a-zöäü0-9-_]/i;
+exports.validateCustomPath = (path) => {
+    if(!path || path.length < 4 || path.length > 128){
+        return [false, 0, "The custom path must be between 4 and 128 characters in length!"];
+    }
+    if(pathUnsaveChars.test(path)){
+        return [false, 1, "Please do not use any special chars in your path!"];
+    }
+    if(illegalPaths.includes(path.toLocaleLowerCase())){
+        return [false, 2, "This path is reserved."];
+    }
+    return [true];
+}
