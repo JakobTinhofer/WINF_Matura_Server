@@ -7,6 +7,8 @@
 	import ViewPages from "./pageTemplates/PageStuff/ViewPages.svelte";
 	import SiteViewer from "./pageTemplates/PageStuff/SiteViewer.svelte";
 	import { checkSiteVisible } from "../scripts/auth";
+	import { getURLParameters, displayPredefinedSMs } from "../scripts/helpers";
+	import MessageAndModalDisplayer, {displayStatusMessage} from "./modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 	import anime from "animejs/lib/anime.es.js";
 	import ModalTest from "./pageTemplates/ModalTest.svelte";
 
@@ -22,6 +24,14 @@
 	let routed = false;
 	
 	let CustomPaths = [];
+
+	window.addEventListener("load", () => {
+		let params = getURLParameters(window.location.search);
+		if(params["sms"]){
+			displayPredefinedSMs(params["sms"], displayStatusMessage);
+		}
+	});
+	
 
 	export function addCustomPath (path, page){
 		CustomPaths[path] = page;
@@ -102,6 +112,7 @@
 	window.addEventListener("load", startAnimation);
 	startRouting(window.location.pathname);
 
+	
 	let pointsHTML = "";
 	for(let i = 0; i < maxDots; i++){
 		pointsHTML += '<span id="point-' + i + '" class="animated-point" style="opacity:100%; transition: opacity 1s;">.</span>'
@@ -171,6 +182,7 @@
 		<title>{title}</title>
 	{/if}
 </svelte:head>
+<MessageAndModalDisplayer/>
 {#if active_page}
 	<svelte:component this={ active_page }/>
 	{#if animId != -1}

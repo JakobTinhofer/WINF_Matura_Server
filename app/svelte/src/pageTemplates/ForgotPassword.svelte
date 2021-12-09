@@ -67,7 +67,6 @@
                         button_message = "Go Login";
                         disableStr = "";
                     }else{
-                        console.debug(res);
                         if(res[2] === 404 || res[2] === 403){
                             page = "resendLink";
                         }

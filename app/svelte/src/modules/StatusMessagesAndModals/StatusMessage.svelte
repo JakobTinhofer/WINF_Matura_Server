@@ -81,6 +81,7 @@
             22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
             41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),
             100px 100px 80px rgba(0, 0, 0, 0.07);
+        pointer-events: all;
     }
 
     span {

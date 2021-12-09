@@ -1,7 +1,8 @@
 <script>
-import {getSitesWithFilter, getOwnUser} from "../../../scripts/auth";
+import {getSitesWithFilter, getOwnUser, deleteSite} from "../../../scripts/auth";
 import SiteCard from "../../modules/SiteCard.svelte";
 import Navbar from "../../modules/Navbar.svelte";
+import {displayModal, displayStatusMessage} from "../../modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 
 let sites = new Array();
 
@@ -18,6 +19,29 @@ function updateUser(){
     getOwnUser(true).then((res) => {user = res;}, (err) => {console.debug(err);});
 }
 updateUser();
+
+
+function ds(id){
+    displayModal({
+        text: "Clicking on DELETE will remove your page. This action cannot be undone, so I hope you won't change your mind!",
+        heading: "Are you sure?",
+        buttons: [{text: "Cancel", color: "blue", closesModal: true},
+                    {text: "DELETE", color: "red", float: "right", closesModal: true, returnValue: "delete_confirmed"}]
+        },
+        async (rv) => {
+            if(rv === "delete_confirmed"){
+                let r = await deleteSite(id);
+                if(r[0]){
+                    displayStatusMessage("Successfully deleted site.", "green");
+                }else{
+                    displayStatusMessage("Error: " + r[1], "tomato");
+                }
+                getSites();
+            }
+        }
+    );
+    
+}
 </script>
 
 <style>
@@ -108,7 +132,7 @@ updateUser();
     {#if sites && sites.length > 0}
         {#each sites as s, i}
             {#if !onlyMyPages || !(user && s.author.username !== user.username)}
-                <SiteCard Site={s} />
+                <SiteCard Site={s} deleteSite={ds}/>
             {/if}
             
         {/each}

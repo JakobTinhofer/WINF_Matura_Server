@@ -6,7 +6,7 @@
     import { getOwnUser } from "../../scripts/auth";
 
     export let Site;
-
+    export let deleteSite = () => {};
     export let do_random_bg = true;
 
     let user;
@@ -84,6 +84,14 @@
         overflow-x: hidden;
     }
 
+    .title{
+        display: inline-block;
+        max-width: 15vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
     .author{
         font-family: 'Roboto', sans-serif;
         font-size: 15px;
@@ -107,10 +115,11 @@
     
     <div class="menu-bar">
         <div class="title_author">
-            <p class="title">{Site.title}</p>
+            <p class="title" title={Site.title}>{Site.title}</p>
             <p style="color: {Site.isPublic ? 'green' : 'red'}" class="publicOrNot">{Site.isPublic ? 'public' : 'private'}</p>
             <br>
             <p class="author">by {Site.author.username}</p>
+            <p class="author" style="color: rgb(40,40,40);">Path: {Site.dir_path_end}</p>
         </div>
         
         <span style="float:right;">
@@ -120,7 +129,8 @@
                     <i class="fas fa-ellipsis-v"></i>
                     <svelte:fragment slot="dropdown-list-elems">
                         <NavbarElement on:click="{window.location= "edit?id=" + Site.hex_id}">Edit</NavbarElement>
-                        <NavbarElement>Delete</NavbarElement>
+                        <NavbarElement on:click="{deleteSite(Site.hex_id)}">Delete</NavbarElement>
+                        <NavbarElement on:click="{() => {}}">Change Path</NavbarElement>
                     </svelte:fragment>
                 </Dropdown>
             {:else}

@@ -8,7 +8,7 @@
 
 <style>
     .modal_main{
-        position: absolute;
+        position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -20,7 +20,7 @@
         color: white;
         position: absolute;
         top: 50%;
-        right: 5%;
+        right: 15px;
         transform: translateY(-50%);
         -ms-transform: translateY(-50%);
         transition: color 0.3s;
@@ -43,14 +43,13 @@
         transition: background-color 0.4s;
         border-width: 0px;
         padding: 8px 15px;
-        
+        color: white;
         font-size: 20px;
         margin: 0px 5px;
     }
 
     .red_btn{
         background-color: red;
-        color: white;
     }
     .red_btn:hover{
         background-color: tomato;
@@ -58,10 +57,16 @@
 
     .green_btn{
         background-color: green;
-        color: white;
     }
     .green_btn:hover{
         background-color: limegreen;
+    }
+
+    .blue_btn{
+        background-color: royalblue;
+    }
+    .blue_btn:hover{
+        background-color: skyblue;
     }
 </style>
 

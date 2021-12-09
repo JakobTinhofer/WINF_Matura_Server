@@ -138,3 +138,18 @@ exports.createCSSSelector = (selector, style) => {
       styleSheet.insertRule(selector + '{' + "background-color: red" + '}', styleSheetLength);
     }
   }
+
+let predefinedStatusMessages = [["You need to log in before performing this action!", "red"],
+                                  ["Success!", "green"]];
+
+
+exports.displayPredefinedSMs = (str, displayFunc) => {
+  let sms = str.split("+");
+  for(const s of sms){
+    let n = Number(s);
+    if(n !== undefined && n < predefinedStatusMessages.length && n >= 0){
+      let m  = predefinedStatusMessages[n];
+      displayFunc(m[0], m[1]);
+    }
+  }
+}

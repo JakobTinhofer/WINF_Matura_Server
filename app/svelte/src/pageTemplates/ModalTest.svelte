@@ -2,7 +2,6 @@
     import MessageAndModalDisplayer, {displayStatusMessage, displayModal, displayModalAsync} from "../modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
     displayStatusMessage("Hello, world!", "royalblue");
     displayStatusMessage("Error!", "tomato");
-    dTestModal();
 
 
     async function dTestModal(){

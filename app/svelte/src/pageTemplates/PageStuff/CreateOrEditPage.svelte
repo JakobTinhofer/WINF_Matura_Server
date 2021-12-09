@@ -1,8 +1,10 @@
 <script>
 import FileIcon from "../../modules/FileIcon.svelte";
-import { createNewSite, getEditFields, checkLoggedIn, sendEditRequest } from "../../../scripts/auth";
+import { createNewSite, getEditFields, checkLoggedIn, sendEditRequest, deleteSite } from "../../../scripts/auth";
 import { getURLParameters } from "../../../scripts/helpers";
+import MessageAndModalDisplayer, {displayModal, displayModalAsync, displayStatusMessage} from "../../modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 import { afterUpdate } from "svelte";
+
 checkLoggedIn(null, "/pages");
 
 const invalidChars = /[*|\",\/:<>?[\]{}`\\()';@&$]/;
@@ -27,7 +29,7 @@ let title;
 let title_valid = false;
 let title_message;
 
-
+$: if(displaySuccessPage) { displayStatusMessage("Success!", "green")}
 
 let upload_msg = "Add Files";
 let fileList = new Array();
@@ -51,18 +53,6 @@ let submit_message;
 
 
 
-function getStartPage(){
-    if(startPage.value === "none")
-
-    if(startPage.value[0] === "a"){
-        return alreadyUploadedFiles[Number(startPage.value.substring(1))];
-    }else{
-        return fileList[Number(startPage.value)].name;
-    }
-}
-
-
-
 
 function setupEdit(){
     window.addEventListener("load", async () => {
@@ -74,7 +64,7 @@ function setupEdit(){
             title.value = r[1]["title"];
             title_valid = true;
 
-            selectSetter = "a0";
+            selectSetter = r[1]["start_file"];
 
             isPublic = r[1]["isPublic"];
 
@@ -114,10 +104,12 @@ function removeAlreadyUploadedFile(index) {
     if(disableInput)
         return;
     
-    filesToRemove.concat(alreadyUploadedFiles[index]);
+    filesToRemove = filesToRemove.concat(alreadyUploadedFiles[index]);
 
     alreadyUploadedFiles.splice(index, 1);
     alreadyUploadedFiles = alreadyUploadedFiles;
+
+    displayStatusMessage("Watch out! Removed files cannot be brought back! If you need this one, you might want to click Discard Changes.", "#ffa200")
 
     validateFiles();
     validateSelect();
@@ -131,12 +123,15 @@ function onFilesAdded() {
         if(!allowedFileTypes.includes(ext)){
             if(!file_upload_message.includes("types"))
                 file_upload_message = "Only these file types are allowed: " + allowedFileTypes.join(', ') + " File extention: " + ext;
-        }else if(fileList.find(e2 => { return e2.fileName === e.fileName }) === undefined && !alreadyUploadedFiles.includes(e.fileName)){
+        }else if(fileList.find(e2 => { return e2.name === e.name }) === undefined && !alreadyUploadedFiles.includes(e.fileName)){
             fileList.push(e);
             validateFiles();
             continue;
-        }else if(!file_upload_message.includes("selected"))
-            file_upload_message += "You already selected this file!";    
+        }else if(!file_upload_message.includes("selected")){
+            file_upload_message += "You already selected this file!";
+            console.log(fileList.find(e2 => { return e2.name === e.name }) + " " + alreadyUploadedFiles.includes(e.fileName))
+        }
+                
         validateFiles(true);
     }
     
@@ -222,7 +217,7 @@ async function onSubmit(e){
 
 async function submitCreate(){
 
-    let r = await createNewSite(title.value, fileList, isPublic, getStartPage());
+    let r = await createNewSite(title.value, fileList, isPublic, startPage.value);
     console.log(r[1]);
     if(r[0]){ 
         redirect = r[1];
@@ -249,11 +244,12 @@ function errorPrinting(r){
             default:
                 submit_message = r[1];
                 break;
-        }
+    }
+    displayStatusMessage(r[1], "red")
 }
 
 async function submitEdit(){
-    let r = await sendEditRequest(urlParams["id"], title.value, fileList, filesToRemove, getStartPage(), isPublic);
+    let r = await sendEditRequest(urlParams["id"], title.value, fileList, filesToRemove, startPage.value, isPublic);
     if(r[0]){
         window.location = "pages";
     }else{
@@ -394,13 +390,23 @@ input[type=submit]:disabled:hover{
 
 #discard{
     margin-left: 10px;
-    background-color: darkred !important;
+    background-color: orangered !important;
     display: inline-block;
 }
 
 #discard:hover{
+    background-color: orange !important;
+}
+
+#delete{
+    margin-left: 10px;
+    background-color: darkred !important;
+}
+
+#delete:hover{
     background-color: red !important;
 }
+
 #file_list{
     margin-bottom: 40px;
 }
@@ -410,8 +416,6 @@ input[type=submit]:disabled:hover{
 <svelte:head>
     <title>{isEdit ? "Edit a page" : "Create a new page"}</title>
 </svelte:head>
-
-
 
 
 {#if displaySuccessPage}
@@ -462,12 +466,12 @@ input[type=submit]:disabled:hover{
 
             {#each fileList as f, i}
                 {#if f.name.toLocaleLowerCase().split('.').pop() === "html"}
-                    <option value = "{i}">{f.name}</option>
+                    <option value = "{f.name}">{f.name}</option>
                 {/if}
             {/each}
             {#each alreadyUploadedFiles as f, i}
                 {#if f.toLocaleLowerCase().split('.').pop() === "html"}
-                    <option value = "a{i}">{f}</option>
+                    <option value = "{f}">{f}</option>
                 {/if}
             {/each}
         </select>
@@ -480,8 +484,29 @@ input[type=submit]:disabled:hover{
                 <button class="box_shadow_light custom_button"
                     id="discard"
                     style="display:inline-block"
-                    value = "Discard Changes"
                     on:click="{(event) => {event.preventDefault();window.location = "pages";}}">Discard Changes</button>
+                <button class="box_shadow_light custom_button"
+                    id="delete"
+                    style="display:inline-block"
+                    on:click="{(event) => {
+                        event.preventDefault();
+                        displayModal({
+                            text: "Clicking on DELETE will remove your page. This action cannot be undone, so I hope you won't change your mind!",
+                            heading: "Are you sure?",
+                            buttons: [{text: "Cancel", color: "blue", closesModal: true},
+                                        {text: "DELETE", color: "red", float: "right", closesModal: true, returnValue: "delete_confirmed"}]},
+                            async (rv) => {
+                                if(rv === "delete_confirmed"){
+                                    let r = await deleteSite(urlParams["id"]);
+                                    if(r[0]){
+                                        window.location = "pages?sms=1";
+                                    }else{
+                                        displayStatusMessage("Error: " + r[1], "tomato");
+                                    }
+                                }
+                            })
+                        return false;
+                        }}">Delete Page</button>
             {/if}
         </div>
     </form>

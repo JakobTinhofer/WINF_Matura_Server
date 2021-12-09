@@ -36,6 +36,7 @@
     }
 
     export function closeModal(rv){
+        console.log("Closing modal");
         modal = undefined;
         onModalChanged();
         if(callback)
@@ -72,16 +73,21 @@
 </script>
 
 <style>
-    div{
+    .statusMsgs{
         padding: 5px;
+        position: fixed;
+        top: 0%;
+        width: 95%;
+        pointer-events: none;
     }
 </style>
-
 {#if rModal !== undefined}
     <Overlay/>
     <Modal text="{rModal.text}" heading="{rModal.heading}" buttons="{rModal.buttons}" headerColor="{rModal.headerColor}" onClose="{closeModal}"/>
 {/if}
-<div>
+
+    
+<div class="statusMsgs">
     {#if statusMessages && statusMessages.length > 0}
         {#each Object.entries(statusMessages) as m, i}
             {#if m[1]}

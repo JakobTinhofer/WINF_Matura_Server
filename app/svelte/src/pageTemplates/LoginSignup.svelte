@@ -87,9 +87,8 @@
                     password,
                     rmbMe)
                     .then((res) => {
-                        console.debug(res);
                         if(res[0]){
-                            console.debug(anime({
+                            (anime({
                                 targets: '.card',
                                 translateY: '200%',
                                 duration: 1000,
