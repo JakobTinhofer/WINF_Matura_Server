@@ -8,10 +8,14 @@ exports.api_url = api_url;
 
 exports.checkLoggedIn = async function (callback, redir = undefined){
     let res = await sendPostRequest("/api/users/check", undefined, redir);
-    if(callback){
-        callback(res[0].authenticated === true);
-    }else{
-        return res[0].authenticated === true;
+    if(res[0] === true){    
+        if(callback){
+            callback(true);
+        }else{
+            return true;
+        }
+    }else if (redir !== undefined){
+        window.location = "/login?redir=" + redir + "&sms=0";
     }
     
 }
@@ -144,7 +148,11 @@ exports.getEditFields = async function (id) {
 }
 
 exports.sendEditRequest = async function(id, title, additional_files, files_to_remove, start_page, isPublic){
-    let r = await sendPostRequest(`/api/sites/editsite?id=${id}&title=${title}&additional_files=${additional_files}&files_to_remove=${files_to_remove}&start_page=${start_page}&isPublic=${isPublic}`);
+    const f = new FormData();
+    for(const file of additional_files){
+        f.append(file.name, file);
+    }
+    let r = await sendPostRequest(`/api/sites/editsite?id=${id}&title=${title}&files_to_remove=${files_to_remove}&entryFile=${start_page}&isPublic=${isPublic}`, f, "pages");
     if(r[1].status === 200){
         return [true, r[0].result];
     }else{
@@ -152,21 +160,31 @@ exports.sendEditRequest = async function(id, title, additional_files, files_to_r
     }
 }
 
+exports.deleteSite = async function (id){
+    let r = await sendPostRequest('/api/sites/deletesite?id=' + id, null, "pages");
+    if(r[1].status === 200){
+        return [true, r[0].result];
+    }else{
+        return [false, r[0].message, r[0].errorCode];
+    }
+}
 async function sendPostRequest(url, body, redirOnNotLoggedIn){
     let act_url = api_url + url;
+    let res;
     try{
         let requestParams = {method: 'POST'}
         if(body)
             requestParams.body = body;
-        let res = await fetch(act_url, requestParams);
+        res = await fetch(act_url, requestParams);
         let resObj = JSON.parse(await res.json()); 
         if(res.status === 403 && resObj.errorCode === 666 && redirOnNotLoggedIn !== undefined){
-            window.location = "/login?redir=" + redirOnNotLoggedIn; 
+            window.location = "/login?redir=" + redirOnNotLoggedIn + "&sms=0"; 
         }
 
         return [resObj, res];
     }catch(error){
-        console.log(error);
+        console.log("Error while handling response: " + error);
+        console.debug(res);
         throw error;
     }
 }
