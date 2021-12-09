@@ -95,7 +95,7 @@
     .author{
         font-family: 'Roboto', sans-serif;
         font-size: 15px;
-        display: block;
+        display: inline;
         margin-left: 3px;
     }
 
@@ -106,6 +106,7 @@
 
     .publicOrNot{
         font-size: 20px;
+        display: inline;
     }
 </style>
 
@@ -116,8 +117,9 @@
     <div class="menu-bar">
         <div class="title_author">
             <p class="title" title={Site.title}>{Site.title}</p>
-            <p style="color: {Site.isPublic ? 'green' : 'red'}" class="publicOrNot">{Site.isPublic ? 'public' : 'private'}</p>
+            
             <br>
+            <p style="color: {Site.isPublic ? 'green' : 'red'}" class="publicOrNot">{Site.isPublic ? 'public' : 'private'}</p>
             <p class="author">by {Site.author.username}</p>
             <p class="author" style="color: rgb(40,40,40);">Path: {Site.dir_path_end}</p>
         </div>
