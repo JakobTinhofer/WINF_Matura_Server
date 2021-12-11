@@ -1,10 +1,9 @@
 let mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
 const helpers = require("../helpers");
-const User = require("./User").schema;
 let verificationSchema = mongoose.Schema({
   user:{
-      type: User,
+      type: Object,
       require: true
   },
   secret:{
@@ -19,10 +18,10 @@ let verificationSchema = mongoose.Schema({
 });
 
 verificationSchema.static('getOrCreateNew', async (user) => {
-    let q = await Verification.find({'user.username': user.username});
+    let q = await Verification.findOne({'user.username': user.username});
     
-    if(q && q.length > 0){
-        return q[0];
+    if(q){
+        return q;
     }
 
     let secret;
@@ -34,8 +33,9 @@ verificationSchema.static('getOrCreateNew', async (user) => {
 
     let ver = new Verification();
     ver.secret = secret;
-    ver.user = user;
+    ver.user = helpers.userToUserInfo(user);
     ver.save();
+    console.log("Created verification ending in '" + secret.substring(secret.length - 11, secret.length - 1) + "' for user " + user.username);
     return ver;
 });
 var Verification = mongoose.model("Verification", verificationSchema);
