@@ -29,6 +29,7 @@ function initialize(){
     if(process.env["DEV_MODE"]){
         app.use(cors());
         console.log("Warning: CORS allows all origins due to dev mode. This can be dangerous!");
+        app.use(require("./api/middleware/queryParser"));
     }else{
         app.use(cors({
     
@@ -38,7 +39,7 @@ function initialize(){
     
     app.use(cookieParser());
     app.use(express.json());
-    app.use(require("./api/middleware/queryParser"))
+    
     bcrypt.genSalt(10,(err,salt)=> 
     bcrypt.hash(process.memoryUsage().heapTotal + "That's mad fam." + process.hrtime()[1] + process.hrtime()[0], salt, (err,hash)=> {
         if(err){
