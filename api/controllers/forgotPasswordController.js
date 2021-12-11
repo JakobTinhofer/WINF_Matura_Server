@@ -25,7 +25,7 @@ exports.sendForgotPassword = async (req, res) => {
         let secret = await helpers.generateNewSecret();
         codes[secret] = [Date.now() + 5 * 1000 * 60, user];
         mailer.sendForgotPasswordCode(user, secret);
-        console.log("Sent forgot password email to " + user.email + " with secret = " + secret);
+        console.log("Sent forgot password email to " + user.email + " with secret ending in '" + secret.substring(secret.length - 11, secret.length - 1) + "'.");
         return;
     }else{
         console.log("Dropping forgot password request since no user with given email found.");
@@ -43,7 +43,7 @@ exports.changePassword = async (req, res) => {
         return;
     }
 
-    console.log("Received change password request. Secret: " + secret);
+    console.log("Received change password request. Secret ends with '" + secret.substring(secret.length - 11, secret.length - 1) + "'.");
 
     if(!secret || !codes[secret]){
         statusController.putJSONError(req, res, new Error("Change Password Error", "Invalid secret. Maybe you clicked the wrong link?", 404, 0));
