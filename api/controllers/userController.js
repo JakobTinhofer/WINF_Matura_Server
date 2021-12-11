@@ -191,20 +191,18 @@ exports.login_user = async (req, res) => {
     console.log("Login attempt with username/email '" + usernameOrEmail + "' and rememberMe='" + rememberMe + "'.");
 
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    let userQuerry;
+    let user;
     if(re.test(String(usernameOrEmail).toLocaleLowerCase())){
-        userQuerry = await User.find({email: usernameOrEmail});
+        user = await User.findOne({email: usernameOrEmail});
     }else{
-        userQuerry = await User.find({username: usernameOrEmail});
+        user = await User.findOne({username: usernameOrEmail});
     }
 
-    if(!userQuerry || userQuerry.length != 1){
+    if(!userQuerry){
         console.log("Login attempt failed since email or username was not found!");
         statusController.putJSONError(req, res, new Error("Login Error", "Invalid Credentials", 403));
         return;
     }
-
-    const user = userQuerry[0];
     bcrypt.compare(password, user.password_hash, (err, isMatch) => {
         if(err){
             console.log("Error encountered while checking password for " + usernameOrEmail + ". Error: " + err);
