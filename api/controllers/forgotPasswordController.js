@@ -4,13 +4,13 @@ const helpers = require("../helpers")
 const statusController = require("./statusController")
 const Error = require("../classes/Error");
 const SuccessMessage = require("../classes/SuccessMessage");
-
+const validator = require("../../common/validators");
 let codes = [];
 
 exports.sendForgotPassword = async (req, res) => {
     let {email} = req.query;
     console.log("Forgot password request for email: " + email);
-    let rs = helpers.validateEmail(email);
+    let rs = validator.validateEmail(email);
     if(!rs[0]){
         statusController.putJSONError(req, res, new Error("Forgot password Error", rs[2], 400, 0));
         console.log("Forgot password request failed since email invalid: " + rs[2]);
@@ -60,6 +60,13 @@ exports.changePassword = async (req, res) => {
     if(password !== password2){
         statusController.putJSONError(req, res, new Error("Change Password Error", "Your passwords do not match!", 400, 2));
         console.log("Could not change password since given passwords do not match.");
+        return;
+    }
+
+    const rs = validator.validatePassword(password);
+    if(rs[0] !== true){
+        statusController.putJSONError(req, res, new Error("Change Password Error", rs[1], 400, 3));
+        console.log("Invalid password.");
         return;
     }
 
