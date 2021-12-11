@@ -24,6 +24,9 @@ let siteSchema = mongoose.Schema({
   hex_id:{
       type: String,
       require: true
+  },
+  tags:{
+      type: [{type: ObjectId, reg: 'Tag'}]
   }
 });
 var Site = mongoose.model("Site", siteSchema);
