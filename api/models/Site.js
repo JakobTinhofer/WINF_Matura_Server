@@ -26,7 +26,7 @@ let siteSchema = mongoose.Schema({
       require: true
   },
   tags:{
-      type: [{type: ObjectId, reg: 'Tag'}]
+      type: [{type: mongoose.Types.ObjectId, reg: 'Tag'}]
   }
 });
 var Site = mongoose.model("Site", siteSchema);
