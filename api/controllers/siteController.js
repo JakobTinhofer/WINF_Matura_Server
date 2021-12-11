@@ -76,9 +76,9 @@ exports.createSite  = async (req, res) => {
         console.log(`Creating site '${title}'. IsPublic: ${isPublic} and Entry: ${entryFile}.'`);
         
 
-        const res = validator.validateSiteTitle(title);
-        if(res[0] !== true){
-            statusController.putJSONError(req, res, new Error("Create Site Error", "Invalid title: " + res[2], 400, 1));
+        const rs = validator.validateSiteTitle(title);
+        if(rs[0] !== true){
+            statusController.putJSONError(req, res, new Error("Create Site Error", "Invalid title: " + rs[2], 400, 1));
             console.log("Invalid title.");
             return;
         }
@@ -297,9 +297,9 @@ exports.editSite = async (req, res) => {
         return;
     }
 
-    const res = validator.validateSiteTitle(title);
-    if(res[0] !== true){
-        statusController.putJSONError(req, res, new Error("Create Site Error", "Invalid title: " + res[2], 400, 1));
+    const rs = validator.validateSiteTitle(title);
+    if(rs[0] !== true){
+        statusController.putJSONError(req, res, new Error("Create Site Error", "Invalid title: " + rs[2], 400, 1));
         console.log("Invalid title.");
         return;
     }

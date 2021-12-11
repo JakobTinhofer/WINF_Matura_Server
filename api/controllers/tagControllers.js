@@ -25,22 +25,22 @@ exports.createNewTag = async (req, res) => {
 
     const { tag_name, tag_color, min_sec, can_sort } = req.query;
 
-    var res = validator.validateTagName(tag_name);
-    if(res[0] !== true){
-        statusController.putJSONError(req, res, new Error("Create Tag Error", "Invalid tag name: " + res[2], 400, 0));
+    var rs = validator.validateTagName(tag_name);
+    if(rs[0] !== true){
+        statusController.putJSONError(req, res, new Error("Create Tag Error", "Invalid tag name: " + rs[2], 400, 0));
         console.log("Invalid tag name!");
         return;
     }
-    res = validator.validateColor(tag_color);
-    if(res[0] !== true){
-        statusController.putJSONError(req, res, new Error("Create Tag Error", "Invalid color: " + res[2], 400, 1));
+    rs = validator.validateColor(tag_color);
+    if(rs[0] !== true){
+        statusController.putJSONError(req, res, new Error("Create Tag Error", "Invalid color: " + rs[2], 400, 1));
         console.log("Invalid color!");
         return;
     }
 
-    res = validator.validateSecLevel(min_sec, req.session.user.sec_level);
-    if(res[0] !== true){
-        statusController.putJSONError(req, res, new Error("Create Tag Error", "Invalid sec level: " + res[2], 400, 2));
+    rs = validator.validateSecLevel(min_sec, req.session.user.sec_level);
+    if(rs[0] !== true){
+        statusController.putJSONError(req, res, new Error("Create Tag Error", "Invalid sec level: " + rs[2], 400, 2));
         console.log("Invalid sec level!");
         return;
     }

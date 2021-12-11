@@ -63,9 +63,9 @@ exports.changePassword = async (req, res) => {
         return;
     }
 
-    const res = validator.validatePassword(password);
-    if(res[0] !== true){
-        statusController.putJSONError(req, res, new Error("Change Password Error", res[1], 400, 3));
+    const rs = validator.validatePassword(password);
+    if(rs[0] !== true){
+        statusController.putJSONError(req, res, new Error("Change Password Error", rs[1], 400, 3));
         console.log("Invalid password.");
         return;
     }
