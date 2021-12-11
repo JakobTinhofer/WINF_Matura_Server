@@ -8,7 +8,8 @@ exports.api_url = api_url;
 
 exports.checkLoggedIn = async function (callback, redir = undefined){
     let res = await sendPostRequest("/api/users/check", undefined, redir);
-    if(res[0] === true){    
+    console.debug(res);
+    if(res[0].authenticated === true){    
         if(callback){
             callback(true);
         }else{
@@ -166,6 +167,15 @@ exports.deleteSite = async function (id){
         return [true, r[0].result];
     }else{
         return [false, r[0].message, r[0].errorCode];
+    }
+}
+
+exports.setCustomPath = async function (id, path){
+    let r = await sendPostRequest('/api/sites/setcustompath?id=' + id  + "&customPath=" + path);
+    if(r[1].status === 200){
+        return [true]
+    }else{
+        return [true, r[0].message, r[0].errorCode];
     }
 }
 async function sendPostRequest(url, body, redirOnNotLoggedIn){

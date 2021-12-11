@@ -7,6 +7,7 @@
 
     export let Site;
     export let deleteSite = () => {};
+    export let sCustomPath = () => {};
     export let do_random_bg = true;
 
     let user;
@@ -132,7 +133,7 @@
                     <svelte:fragment slot="dropdown-list-elems">
                         <NavbarElement on:click="{window.location= "edit?id=" + Site.hex_id}">Edit</NavbarElement>
                         <NavbarElement on:click="{deleteSite(Site.hex_id)}">Delete</NavbarElement>
-                        <NavbarElement on:click="{() => {}}">Change Path</NavbarElement>
+                        <NavbarElement on:click="{() => {sCustomPath(Site.hex_id);}}">Change Path</NavbarElement>
                     </svelte:fragment>
                 </Dropdown>
             {:else}
