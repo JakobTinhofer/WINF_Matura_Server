@@ -130,7 +130,7 @@ async function sendBasicJSONPostRequest(url, obj = {}, redirOnNotLoggedIn = unde
         if(res.status === 200){
             return [true, resObj.result];
         }else{
-            if(redirOnNotLoggedIn)
+            if(redirOnNotLoggedIn && res.status === 401)
                 window.location = "/login?redir=" + redirOnNotLoggedIn + "&sms=0";
             return [false, resObj.message, resObj.errorCode, res.status];
         }
