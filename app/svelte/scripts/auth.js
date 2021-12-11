@@ -4,7 +4,11 @@ export const api_url = "/api/";
 
 
 export const checkLoggedIn = async function (callback, redir = undefined){
-    let res =  await sendBasicJSONPostRequest('users/check', {}, redir);
+    let res = await sendBasicJSONPostRequest('users/check', {}, redir);
+    if(callback){
+        callback(res[0]);
+    }
+    return res[0];
 }
 
 export const tryLogIn = async function (uoe, password, rememberMe, callback){
@@ -21,14 +25,7 @@ export const logOut = async function (callback){
 }
 
 export const trySignUp = async function (username, email, password, password2, callback){
-    let res = await sendPostRequest(`users/register?username=${username}&email=${email}&password=${password}&password2=${password2}`);
-    if(res[1].status === 200){
-        return [String(res[0].message).toLocaleLowerCase() === "successfully registered user.", undefined, undefined];
-    }
-    else if(res[1].status === 400 || res[1].status === 403){
-        return [false,  res[0].message, res[0].errorCode];
-    }
-    return [false, 'Unknown Error'];
+    return await sendBasicJSONPostRequest('users/register', {username: username, email: email, password: password, password2: password2});
 }
 
 export const tryVerifyAccount = async function (secret, callback){
