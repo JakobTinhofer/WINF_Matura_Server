@@ -134,7 +134,14 @@
                 {#each fields as f, i}
                     
                     <p class="invalid_msg" style="display: {fieldValid[i] && fieldValid[i][1] && fieldValid[i][1].length > 1 && !fieldValid[i][0] ? "block" : "none"}">{fieldValid[i] !== undefined ? fieldValid[i][1] : ' '}</p>
-                    <input bind:value="{fieldValues[i]}" type="text" placeholder="{f.placeholder}" name="{f.name}" on:keyup="{() => {fieldValid[i] = f.validate(fieldValues[i]); validChanged();}}"/>
+                    <input bind:value="{fieldValues[i]}" type="text" placeholder="{f.placeholder}" name="{f.name}" on:keyup="{() => {
+                            var v = f.validate(fieldValues[i]);
+                            if(v.length === 2)
+                                fieldValid[i] = v; 
+                            else
+                                fieldValid[i] = [v[0], v[2]];
+                            validChanged();
+                        }}"/>
                 {/each}
             </div>
         {/if}
@@ -144,7 +151,7 @@
                     {#if b.requireAllValid}
                     <button class="{b.color}_btn" disabled={totalValid ? '' : 'disabled'} style="float: {b.float ? b.float : ""}" on:click="{() => {
                             if(b.onClick !== undefined)
-                                b.onClick(getSubmissionValue(i, b.returnValue));
+                                b.onClick(getSubmissionValue(i, b.returnValue)); 
                             if(b.closesModal === true)
                                 onClose(getSubmissionValue(i, b.returnValue));
                         }}">
