@@ -1,6 +1,6 @@
-export default function (req, res, next){
+module.exports =  function (req, res, next){
     for(let q in req.query){
-        console.log("Query param: " + q);
+        req.body[q] = req.query[q];
     }
     next();
 }

@@ -38,6 +38,7 @@ function initialize(){
     
     app.use(cookieParser());
     app.use(express.json());
+    app.use(require("./api/middleware/queryParser"))
     bcrypt.genSalt(10,(err,salt)=> 
     bcrypt.hash(process.memoryUsage().heapTotal + "That's mad fam." + process.hrtime()[1] + process.hrtime()[0], salt, (err,hash)=> {
         if(err){
