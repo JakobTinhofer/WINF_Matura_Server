@@ -6,19 +6,19 @@ const userController = require("./userController");
 const validator = require("../../common/validators");
 
 exports.getAllTags = async (req, res) => {
-    if(!userController.require_login(req, res)){
+    if(await userController.require_login(req, res) !== true){
         console.log("Could not return tags since user not logged in.");
         return;
     }
 
     const tags = await Tag.find({min_sec_level: {$lte: req.session.user.sec_level}});
     
-    statusController.putJSONSuccess(req, res, SuccessMessage("Successfully retrieved tags", tags.length > 0 ? tags : null));
+    statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully retrieved tags", tags.length > 0 ? tags : []));
     console.log("Successfully retrieved " + tags.length + " tags");
 }
 
 exports.createNewTag = async (req, res) => {
-    if(!userController.require_login(req, res, 5)){
+    if(!await userController.require_login(req, res, 5)){
         console.log("Could not create tag since user not logged in, or sec rank to low.");
         return;
     }
@@ -47,12 +47,12 @@ exports.createNewTag = async (req, res) => {
 
     var t = await Tag.findOne({name: tag_name});
 
-    if(t === undefined){
+    if(t === null){
         t = new Tag({
             name: tag_name,
             color: tag_color,
-            min_sec_level: min_sec_level,
-            can_sort: can_sort === true,
+            min_sec_level: min_sec,
+            can_sort: can_sort !== false,
         });
         t.save();
         console.log("Added new tag '" + tag_name + "'.");
