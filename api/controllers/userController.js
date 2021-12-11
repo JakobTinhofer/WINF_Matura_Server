@@ -100,31 +100,25 @@ exports.require_login = async (req, res, minSecCode) => {
 exports.verify_user = async (req, res) => {
     let {secret} = req.body;
 
-    console.log("Trying to verify user...");
+    console.log("Trying to verify user with secret that ends with '" + secret.substring(secret.length - 11, secret.length - 1) +  "'...");
 
-    let ver = await Verification.find({secret: secret});
+    let verification = await Verification.findOne({secret: secret});
 
-    if(!ver || ver.length < 1){
+    if(!verification){
         statusController.putJSONError(req, res, new Error("Verification Error", "The verify link seems to be wrong... don't know if you or we messed up here...", 404, 0));
         console.log("Could not verify user since verify secret was not found in database.");
         return;
     }
-    if(ver.length > 1){
-        statusController.putJSONError(req, res, new Error("Verification Error", "Double entry in DB. If this were my job, I'd get fired.", 500, 1));
-        console.log("Fatal error: double entry for verification secret!");
-        return;
-    }
-    const verification = ver[0];
 
     if(verification.alreadyVerified){
-        statusController.putJSONSuccess(req, res, new SuccessMessage("You were already verified!", verification.user));
+        statusController.putJSONSuccess(req, res, new SuccessMessage("You were already verified!", 1));
         console.log("User " + verification.user.username + " tried to verify, but is already verified!");
         return;
     }
 
-    statusController.putJSONSuccess(req, res, new SuccessMessage("Account verified!", verification.user));
+    
 
-    let user = await User.findOne({"user.username": verification.user.username});
+    let user = await User.findOne({username: verification.user.username});
     if(!user){
         statusController.putJSONError(req, res, new Error("Verification Error", "Internal server error while trying to verify you :(", 500, 999));
         console.log("FATAL: Could not find user " + verification.user.username + " in database!!!!");
@@ -134,7 +128,9 @@ exports.verify_user = async (req, res) => {
     console.log(user);
     await user.save();
     verification.alreadyVerified = true;
+    verification.user.verified = true;
     await verification.save();
+    statusController.putJSONSuccess(req, res, new SuccessMessage("Account verified!", 0));
     console.log("Successfully verified user " + user.username + "!");
 }
 
