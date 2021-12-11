@@ -128,7 +128,7 @@ exports.createSite  = async (req, res) => {
 }
 
 exports.getSiteByPath = async (req, res) => {
-    const {pathEnd} = req.query;
+    const {pathEnd} = req.body;
 
     if(!pathEnd || illegalChars.test(pathEnd)){
         statusController.putJSONError(req, res, new Error("Get Site Error", "Please provide a valid site path", 400, 0));
@@ -219,7 +219,7 @@ exports.getSiteContent = async (req, res) => {
 }
 
 exports.getVisibleSitesByFilter = async (req, res) => {
-    const {filter} = req.query;
+    const {filter} = req.body;
 
     if(!await userController.require_login(req, res)){
         console.log("Couldn't query pages since user not logged in.");
@@ -239,7 +239,7 @@ exports.getVisibleSitesByFilter = async (req, res) => {
 }
 
 exports.getEditFields = async (req, res) => {
-    const {id} = req.query;
+    const {id} = req.body;
 
     if(!await userController.require_login(req, res)){
         console.log("Could not return edit fields since user not logged in.");
@@ -426,7 +426,7 @@ exports.editSite = async (req, res) => {
 }
 
 exports.deleteSite = async (req, res) => {
-    const {id} = req.query;
+    const {id} = req.body;
 
     if(!await userController.require_login(req, res))
             return;
@@ -462,7 +462,7 @@ exports.deleteSite = async (req, res) => {
 }
 
 exports.setCustomPath = async (req, res) => {
-    const {id, customPath} = req.query;
+    const {id, customPath} = req.body;
 
     if(!await userController.require_login(req, res)){
         console.log("Could not set custom path since user not logged in.");

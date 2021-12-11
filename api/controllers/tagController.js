@@ -23,7 +23,7 @@ exports.createNewTag = async (req, res) => {
         return;
     }
 
-    const { tag_name, tag_color, min_sec, can_sort } = req.query;
+    const { tag_name, tag_color, min_sec, can_sort } = req.body;
 
     var rs = validator.validateTagName(tag_name);
     if(rs[0] !== true){

@@ -1,45 +1,27 @@
+import {displayStatusMessage} from '../src/modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte';
+
+export const api_url = "/api/";
 
 
-const api_url = "";
-
-exports.api_url = api_url;
-
-
-
-exports.checkLoggedIn = async function (callback, redir = undefined){
-    let res = await sendPostRequest("/api/users/check", undefined, redir);
-    console.debug(res);
-    if(res[0].authenticated === true){    
-        if(callback){
-            callback(true);
-        }else{
-            return true;
-        }
-    }else if (redir !== undefined){
-        window.location = "/login?redir=" + redir + "&sms=0";
-    }
-    
+export const checkLoggedIn = async function (callback, redir = undefined){
+    let res =  await sendBasicJSONPostRequest('users/check', {}, redir);
 }
 
-exports.tryLogIn = async function (uoe, password, rememberMe, callback){
-    let res = await sendPostRequest(`/api/users/login?usernameOrEmail=${uoe}&password=${password}&rememberMe=${rememberMe}`); 
-    if(res[1].status === 200){
-        cached = res[0].result;
-        return [String(res[0].message).toLocaleLowerCase() === "login successfull.", undefined];
+export const tryLogIn = async function (uoe, password, rememberMe, callback){
+    let res =  await sendBasicJSONPostRequest('users/login', {usernameOrEmail: uoe, password: password, rememberMe: rememberMe});
+    if(res[0] === true){
+        cached = res[1];
     }
-    else if(res[1].status === 400 || res[1].status === 403){
-        return [false,  res[0].message];
-    }
-    return [false, 'Unknown Error'];
+    return res;
 }
 
-exports.logOut = async function (callback){
+export const logOut = async function (callback){
     cached = undefined;
-    sendPostRequest("/api/users/logout");
+    await sendBasicJSONPostRequest("users/logout");
 }
 
-exports.trySignUp = async function (username, email, password, password2, callback){
-    let res = await sendPostRequest(`/api/users/register?username=${username}&email=${email}&password=${password}&password2=${password2}`);
+export const trySignUp = async function (username, email, password, password2, callback){
+    let res = await sendPostRequest(`users/register?username=${username}&email=${email}&password=${password}&password2=${password2}`);
     if(res[1].status === 200){
         return [String(res[0].message).toLocaleLowerCase() === "successfully registered user.", undefined, undefined];
     }
@@ -49,51 +31,36 @@ exports.trySignUp = async function (username, email, password, password2, callba
     return [false, 'Unknown Error'];
 }
 
-exports.tryVerifyAccount = async function (secret, callback){
-    let res = await sendPostRequest("/api/users/verify?secret=" + secret);
-    if(res[1].status === 200){
-        return [true, res[0].message];
-    }
-    return [false, res[0].message, res[0].errorCode];
+export const tryVerifyAccount = async function (secret, callback){
+    return await sendBasicJSONPostRequest('users/verify', {secret: secret}, "");
 }
 
 let cached;
-exports.getOwnUser = async function(allow_cached, callback){
+export const getOwnUser = async function(allow_cached, callback){
     if(allow_cached && cached)
         return cached;
-    let result = await sendPostRequest("/api/users/userinfo");
-
-    if(result[1].status === 200){
-        cached = result[0];
-        return result[0];
+    let result = await sendBasicJSONPostRequest("users/userinfo");
+    if(result[0]){
+        cached = result[1];
+        return result[1];
     }
     return undefined;
 }
 
-exports.resendVerificationEmail = async function(email){
-    let r = await sendPostRequest("/api/users/resend_verification?email=" + email);
+export const resendVerificationEmail = async function(email){
+    return await sendBasicJSONPostRequest('users/resend_verification', {email: email}, "");
 }
 
 
-exports.sendForgotPasswordRequest = async function (email){
-    let r = await sendPostRequest("/api/users/forgotpassword?email=" + email);
-    if(r[1].status === 200){
-        return [true];
-    }else{
-        return [false, r[0].message];
-    }
+export const sendForgotPasswordRequest = async function (email){
+    return await sendBasicJSONPostRequest('users/forgotpassword', {email: email}, "");
 }
 
-exports.changePassword = async function (secret, password, password2) {
-    let r = await sendPostRequest(`/api/users/changepassword?secret=${secret}&password=${password}&password2=${password2}`);
-    if(r[1].status === 200){
-        return [true];
-    }else{
-        return [false, r[0].message, r[1].status];
-    }
+export const changePassword = async function (secret, password, password2) {
+    return await sendBasicJSONPostRequest('users/changepassword', {secret: secret, password: password, password2: password2}, "");
 }
 
-exports.createNewSite = async function (title, files, isPublic, startPage) {
+export const createNewSite = async function (title, files, isPublic, startPage) {
     const f = new FormData();
     f.append("title", title);
     for(const file of files){
@@ -101,7 +68,7 @@ exports.createNewSite = async function (title, files, isPublic, startPage) {
     }
     f.append("isPublic", isPublic);
     f.append("entryFile", startPage)
-    let r = await sendPostRequest("/api/sites/create", f);
+    let r = await sendPostRequest("sites/create", f);
     if(r[1].status === 200){
         return [true, r[0].result];
     }else{
@@ -109,51 +76,32 @@ exports.createNewSite = async function (title, files, isPublic, startPage) {
     }
 }
 
-exports.getSitesWithFilter = async function (filter) {
-    let r;
-    if(filter)
-        r = await sendPostRequest(`/api/sites/getvisible?filter=${filter}`, null, "pages");
-    else
-        r = await sendPostRequest(`/api/sites/getvisible`, null, "pages");
-    if(r[1].status === 200){
-        return [true, r[0].result];
-    }else{
-        return [false, r[0].message, r[0].errorCode]
-    }
+export const getSitesWithFilter = async function (filter) {
+    return await sendBasicJSONPostRequest('sites/getvisible', {filter: filter}, "pages");
 } 
 
-exports.checkSiteVisible = async function (pathname) {
-    let r = await fetch(`/api/sites${pathname}`)
+export const checkSiteVisible = async function (pathname) {
+    let r = await fetch(`sites/${pathname}`)
     if(r.status !== 200){
         return false;
     }
     return true;
 }
 
-exports.getSiteByPath = async function (pathname) {
-    let r = await sendPostRequest(`/api/sites/getbypath?pathEnd=${pathname}`);
-    if(r[1].status === 200){
-        return [true, r[0].result];
-    }else{
-        return [false, r[0].message, r[0].errorCode]
-    }
+export const getSiteByPath = async function (pathname) {
+    return await sendBasicJSONPostRequest('sites/getbypath', {pathEnd: pathname}, "pages");
 }
 
-exports.getEditFields = async function (id) {
-    let r = await sendPostRequest(`/api/sites/geteditfields?id=${id}`, null, "pages");
-    if(r[1].status === 200){
-        return [true, r[0].result];
-    }else{
-        return [false, r[0].message, r[0].errorCode];
-    }
+export const getEditFields = async function (id) {
+    return await sendBasicJSONPostRequest('sites/geteditfields', {id: id}, "pages");
 }
 
-exports.sendEditRequest = async function(id, title, additional_files, files_to_remove, start_page, isPublic){
+export const sendEditRequest = async function(id, title, additional_files, files_to_remove, start_page, isPublic){
     const f = new FormData();
     for(const file of additional_files){
         f.append(file.name, file);
     }
-    let r = await sendPostRequest(`/api/sites/editsite?id=${id}&title=${title}&files_to_remove=${files_to_remove}&entryFile=${start_page}&isPublic=${isPublic}`, f, "pages");
+    let r = await sendPostRequest(`sites/editsite?id=${id}&title=${title}&files_to_remove=${files_to_remove}&entryFile=${start_page}&isPublic=${isPublic}`, f, "pages");
     if(r[1].status === 200){
         return [true, r[0].result];
     }else{
@@ -161,23 +109,41 @@ exports.sendEditRequest = async function(id, title, additional_files, files_to_r
     }
 }
 
-exports.deleteSite = async function (id){
-    let r = await sendPostRequest('/api/sites/deletesite?id=' + id, null, "pages");
-    if(r[1].status === 200){
-        return [true, r[0].result];
-    }else{
-        return [false, r[0].message, r[0].errorCode];
+export const deleteSite = async function (id){
+    return await sendBasicJSONPostRequest('sites/deletesite', {id: id}, "pages");
+}
+
+export const setCustomPath = async function (id, path){
+    return await sendBasicJSONPostRequest('sites/setcustompath', {id: id, customPath: path}, "pages");
+}
+
+async function sendBasicJSONPostRequest(url, obj = {}, redirOnNotLoggedIn = undefined){
+    let act_url = api_url + url;
+    let res;
+    try{
+        res = await fetch(act_url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(obj)
+        })
+        let resObj = JSON.parse(await res.json());
+        if(res.status === 200){
+            return [true, resObj.result];
+        }else{
+            if(redirOnNotLoggedIn)
+                window.location = "/login?redir=" + redirOnNotLoggedIn + "&sms=0";
+            return [false, resObj.message, resObj.errorCode, res.status];
+        }
+    }catch(error){
+        showStatusMessage("Error while handling response: " + error);
+        displayStatusMessage(res, "red");
+        throw error;
     }
 }
 
-exports.setCustomPath = async function (id, path){
-    let r = await sendPostRequest('/api/sites/setcustompath?id=' + id  + "&customPath=" + path);
-    if(r[1].status === 200){
-        return [true]
-    }else{
-        return [true, r[0].message, r[0].errorCode];
-    }
-}
 async function sendPostRequest(url, body, redirOnNotLoggedIn){
     let act_url = api_url + url;
     let res;
@@ -187,14 +153,14 @@ async function sendPostRequest(url, body, redirOnNotLoggedIn){
             requestParams.body = body;
         res = await fetch(act_url, requestParams);
         let resObj = JSON.parse(await res.json()); 
-        if(res.status === 403 && resObj.errorCode === 666 && redirOnNotLoggedIn !== undefined){
+        if(res.status === 401 && resObj.errorCode === 666 && redirOnNotLoggedIn !== undefined){
             window.location = "/login?redir=" + redirOnNotLoggedIn + "&sms=0"; 
         }
 
         return [resObj, res];
     }catch(error){
         console.log("Error while handling response: " + error);
-        console.debug(res);
+        displayStatusMessage(res, "red");
         throw error;
     }
 }
