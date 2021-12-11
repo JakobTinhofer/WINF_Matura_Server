@@ -11,7 +11,7 @@ const statusController = require("./statusController");
 const bcrypt = require("bcrypt");
 
 exports.registerUser = async (req, res) => {
-    const {username,email, password, password2} = req.query;
+    const {username,email, password, password2} = req.body;
     console.log('Register User Attempt: Username: "' + username+ '"and email: "' + email+ '"');
     if(!username || !email || !password || !password2) {
         statusController.putJSONError(req, res, new Error("Register Error", "Please provide all fields!", 400, -1));
@@ -83,7 +83,7 @@ exports.registerUser = async (req, res) => {
 
 exports.require_login = async (req, res, minSecCode) => {
     if(req.session.authenticated !== true){
-        statusController.putJSONError(req, res, new Error("Access Denied", "Please login before using this route.", 403, 666));
+        statusController.putJSONError(req, res, new Error("Access Denied", "Please login before using this route.", 401, 666));
         console.log("Route required login, but not logged in!");
         return false;
     }
@@ -98,33 +98,27 @@ exports.require_login = async (req, res, minSecCode) => {
 }
 
 exports.verify_user = async (req, res) => {
-    let {secret} = req.query;
+    let {secret} = req.body;
 
-    console.log("Trying to verify user...");
+    console.log("Trying to verify user with secret that ends with '" + secret.substring(secret.length - 11, secret.length - 1) +  "'...");
 
-    let ver = await Verification.find({secret: secret});
+    let verification = await Verification.findOne({secret: secret});
 
-    if(!ver || ver.length < 1){
+    if(!verification){
         statusController.putJSONError(req, res, new Error("Verification Error", "The verify link seems to be wrong... don't know if you or we messed up here...", 404, 0));
         console.log("Could not verify user since verify secret was not found in database.");
         return;
     }
-    if(ver.length > 1){
-        statusController.putJSONError(req, res, new Error("Verification Error", "Double entry in DB. If this were my job, I'd get fired.", 500, 1));
-        console.log("Fatal error: double entry for verification secret!");
-        return;
-    }
-    const verification = ver[0];
 
     if(verification.alreadyVerified){
-        statusController.putJSONSuccess(req, res, new SuccessMessage("You were already verified!", verification.user));
+        statusController.putJSONSuccess(req, res, new SuccessMessage("You were already verified!", 1));
         console.log("User " + verification.user.username + " tried to verify, but is already verified!");
         return;
     }
 
-    statusController.putJSONSuccess(req, res, new SuccessMessage("Account verified!", verification.user));
+    
 
-    let user = await User.findOne({"user.username": verification.user.username});
+    let user = await User.findOne({username: verification.user.username});
     if(!user){
         statusController.putJSONError(req, res, new Error("Verification Error", "Internal server error while trying to verify you :(", 500, 999));
         console.log("FATAL: Could not find user " + verification.user.username + " in database!!!!");
@@ -134,12 +128,14 @@ exports.verify_user = async (req, res) => {
     console.log(user);
     await user.save();
     verification.alreadyVerified = true;
+    verification.user.verified = true;
     await verification.save();
+    statusController.putJSONSuccess(req, res, new SuccessMessage("Account verified!", 0));
     console.log("Successfully verified user " + user.username + "!");
 }
 
 exports.resend_verification = async (req, res) => {
-    let {email} = req.query;
+    let {email} = req.body;
 
     console.log("Received resend verification request for user " + email + ".");
 
@@ -165,9 +161,9 @@ exports.resend_verification = async (req, res) => {
 
 exports.check_login_status = async (req, res) => {
     if(req.session && req.session.authenticated){
-        res.json(JSON.stringify({'authenticated' : req.session.authenticated}));
+        statusController.putJSONSuccess(req, res, new SuccessMessage("You are logged in", {'authenticated' : req.session.authenticated}));
     }else{
-        res.json(JSON.stringify({'authenticated' : false}));
+        statusController.putJSONError(req, res, new Error("You are not logged in", {'authenticated' : false}, 401, 0));
     }
         
 }
@@ -191,7 +187,7 @@ exports.login_user = async (req, res) => {
         return;
     }
 
-    const {usernameOrEmail, password, rememberMe} = req.query;
+    const {usernameOrEmail, password, rememberMe} = req.body;
     console.log("Login attempt with username/email '" + usernameOrEmail + "' and rememberMe='" + rememberMe + "'.");
 
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -215,7 +211,7 @@ exports.login_user = async (req, res) => {
         }
         if(isMatch){
             if(user.verified !== true){
-                statusController.putJSONError(req, res, new Error("Login Error", "Your account has not yet been activated! Please check your emails.", 403, 0));
+                statusController.putJSONError(req, res, new Error("Login Error", "Your account has not yet been activated! Please check your emails.", 400, 0));
                 console.log("Blocked login since account has not yet been activated.");
                 return;
             }
@@ -240,11 +236,8 @@ exports.login_user = async (req, res) => {
 
 
 exports.getUserInfo = async (req, res) => {
-    const {username} = req.fields ? req.fields: req.query;
-    if(!req.session || req.session.authenticated !== true){
-        statusController.putJSONError(req, res, new Error("Get User Info Error", "Please sign in in order to get user info.", 403, 999));
-        return;
-    }
+    const {username} = req.fields ? req.fields: req.body;
+    if(!await this.require_login(req, res)) return;
 
     if(username !== undefined && username !== req.session.user.username && req.session.user.sec_level < 5){
         statusController.putJSONError(req, res, new Error("Get User Info Error", "You are not authorized to query user info that is not yours.", 403, 3));
@@ -254,7 +247,7 @@ exports.getUserInfo = async (req, res) => {
 
     if(username === undefined || username === req.session.user.username){
         
-        res.json(JSON.stringify(helpers.userToUserInfo(req.session.user)));
+        statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully received user info", helpers.userToUserInfo(req.session.user)));
         return;
     }
 

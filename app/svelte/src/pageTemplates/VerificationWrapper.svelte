@@ -14,7 +14,7 @@
 
         let res = await tryVerifyAccount(urlParams["secret"]);
         if(res[0] === true){
-            message = res[1];
+            message = "Successfully verified account!";
             status = "success";
             action = "go log in";
         }else{

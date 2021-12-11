@@ -8,7 +8,7 @@ const validator = require("../../common/validators");
 let codes = [];
 
 exports.sendForgotPassword = async (req, res) => {
-    let {email} = req.query;
+    let {email} = req.body;
     console.log("Forgot password request for email: " + email);
     let rs = validator.validateEmail(email);
     if(!rs[0]){
@@ -25,7 +25,7 @@ exports.sendForgotPassword = async (req, res) => {
         let secret = await helpers.generateNewSecret();
         codes[secret] = [Date.now() + 5 * 1000 * 60, user];
         mailer.sendForgotPasswordCode(user, secret);
-        console.log("Sent forgot password email to " + user.email + " with secret = " + secret);
+        console.log("Sent forgot password email to " + user.email + " with secret ending in '" + secret.substring(secret.length - 11, secret.length - 1) + "'.");
         return;
     }else{
         console.log("Dropping forgot password request since no user with given email found.");
@@ -35,7 +35,7 @@ exports.sendForgotPassword = async (req, res) => {
 }
 
 exports.changePassword = async (req, res) => {
-    let {secret, password, password2} = req.query;
+    let {secret, password, password2} = req.body;
 
     if(!password || !password2 || !secret){
         statusController.putJSONError(req, res, new Error("Change Password Error", "Please fill out all fields!"));
@@ -43,7 +43,7 @@ exports.changePassword = async (req, res) => {
         return;
     }
 
-    console.log("Received change password request. Secret: " + secret);
+    console.log("Received change password request. Secret ends with '" + secret.substring(secret.length - 11, secret.length - 1) + "'.");
 
     if(!secret || !codes[secret]){
         statusController.putJSONError(req, res, new Error("Change Password Error", "Invalid secret. Maybe you clicked the wrong link?", 404, 0));
@@ -52,7 +52,7 @@ exports.changePassword = async (req, res) => {
     }
 
     if(codes[secret][0] <= Date.now()){
-        statusController.putJSONError(req, res, new Error("Change Password Error", "Sorry, this link has expired", 403, 1));
+        statusController.putJSONError(req, res, new Error("Change Password Error", "Sorry, this link has expired", 404, 1));
         console.log("Could not change password since link has expired.");
         return;
     }

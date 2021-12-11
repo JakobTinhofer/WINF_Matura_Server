@@ -60,7 +60,6 @@ function validateCustomPath(path){
 }*/
 
 async function sCustomPath(id){
-    console.debug(validator);
     let r = await displayModalAsync({
         text: "Choose a new path. Please do not use any special chars!",
         heading: "Set Custom Path",
