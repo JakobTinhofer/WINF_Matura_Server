@@ -67,7 +67,7 @@
                         button_message = "Go Login";
                         disableStr = "";
                     }else{
-                        if(res[2] === 404 || res[2] === 403){
+                        if(res[3] === 404 || res[3] === 403){
                             page = "resendLink";
                         }
                         disableStr = "";

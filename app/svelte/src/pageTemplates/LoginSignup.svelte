@@ -12,6 +12,7 @@
     import LoadingSpinner from "../modules/LoadingSpinner.svelte";
 
     import anime from 'animejs';
+import { displayStatusMessage } from "../modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 
     export let isLogin = true;
 
@@ -111,7 +112,7 @@
                             
                             
                         }
-                    }, (err) => {console.log("Error: ");console.debug(err);});
+                    }, (err) => {console.log("Error: " + err); displayStatusMessage("Error: " + err, "red");});
         }else{
             disableInput = false;
         }
@@ -377,7 +378,7 @@
                     isValid = false;
                     disableInput = false;
                 }
-            }, (err) => {console.debug(err);});
+            }, (err) => {displayStatusMessage("Error: " + err);});
         }else{
             disableInput = false;
         }

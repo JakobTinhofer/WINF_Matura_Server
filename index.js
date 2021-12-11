@@ -37,11 +37,11 @@ function initialize(){
     }
     
     app.use(cookieParser());
+    app.use(express.json());
     bcrypt.genSalt(10,(err,salt)=> 
     bcrypt.hash(process.memoryUsage().heapTotal + "That's mad fam." + process.hrtime()[1] + process.hrtime()[0], salt, (err,hash)=> {
         if(err){
-            console.log("Error while trying to hash secret: " + err + "!!!! Register Attempt Failed.");
-            statusController.putJSONError(req, res, new Error("Register Error", "Internal Error while trying to hash secret.", 500));
+            console.log("Error while trying to hash secret: " + err + "!!!!");
             process.exit(-1);
         }
         app.use(sessions({

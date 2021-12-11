@@ -4,6 +4,7 @@
     import NavbarElement from "./NavbarElement.svelte";
     import { getRandomColor } from "../../scripts/helpers";
     import { getOwnUser } from "../../scripts/auth";
+    import { displayStatusMessage } from "./StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 
     export let Site;
     export let deleteSite = () => {};
@@ -13,7 +14,7 @@
     let user;
 
     function updateUser(){
-        getOwnUser(true).then((res) => {user = res;}, (err) => {console.debug(err);});
+        getOwnUser(true).then((res) => {user = res;}, (err) => {displayStatusMessage("Error: " + err, "red");});
     }
     updateUser();
     </script>
