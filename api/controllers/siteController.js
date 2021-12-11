@@ -5,12 +5,10 @@ const SuccessMessage = require("../classes/SuccessMessage");
 const helpers = require("../helpers");
 const statusController = require("./statusController");
 const userController = require("./userController");
-const { request } = require("express");
 const path = require('path');
 const fs = require('fs');
-const { Console } = require("console");
 const formidable = require("formidable");
-const { title } = require("process");
+const validator = require("../../common/validators")
 
 const illegalChars = /[^A-z0-9äöü\-_.]/;
 function nameCreator9000(name) {
@@ -78,8 +76,9 @@ exports.createSite  = async (req, res) => {
         console.log(`Creating site '${title}'. IsPublic: ${isPublic} and Entry: ${entryFile}.'`);
         
 
-        if(!title || title.length < 2 || title.length > 40){
-            statusController.putJSONError(req, res, new Error("Create Site Error", "The title you provided was invalid. Please provide a title of length between 5 and 40 characters.", 400, 0));
+        const res = validator.validateSiteTitle(title);
+        if(res[0] !== true){
+            statusController.putJSONError(req, res, new Error("Create Site Error", "Invalid title: " + res[2], 400, 1));
             console.log("Invalid title.");
             return;
         }
@@ -298,8 +297,9 @@ exports.editSite = async (req, res) => {
         return;
     }
 
-    if(!title || title.length < 2 || title.length > 40){
-        statusController.putJSONError(req, res, new Error("Edit Site Error", "The title you provided was invalid. Please provide a title of length between 5 and 40 characters.", 400, 0));
+    const res = validator.validateSiteTitle(title);
+    if(res[0] !== true){
+        statusController.putJSONError(req, res, new Error("Create Site Error", "Invalid title: " + res[2], 400, 1));
         console.log("Invalid title.");
         return;
     }
@@ -469,7 +469,7 @@ exports.setCustomPath = async (req, res) => {
         return;
     }
 
-    const check = helpers.validateCustomPath(customPath);
+    const check = validator.validateCustomPath(customPath);
     if(!check[0]){
         console.log("Could not change path since path is invalid!");
         statusController.putJSONError(req, res, new Error("Set Custom Path Error", "Sorry, your path is invalid: " + check[2], 400, 0));

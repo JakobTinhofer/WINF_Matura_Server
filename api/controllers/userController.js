@@ -6,6 +6,7 @@ const SuccessMessage = require("../classes/SuccessMessage");
 const session = require("express-session");
 const mailer = require("../mail/mailer")
 const helpers = require("../helpers")
+const validator = require("../../common/validators");
 const statusController = require("./statusController");
 const bcrypt = require("bcrypt");
 
@@ -27,21 +28,21 @@ exports.registerUser = async (req, res) => {
     
     
     
-    let rs= helpers.validateEmail(email);
+    let rs= validator.validateEmail(email);
     if(!rs[0]){
         statusController.putJSONError(req, res, new Error("Register Error", rs[2], 400, 0));
         console.log("Register user attempt failed since email invalid: " + rs[2]);
         return;
     }
     
-    rs = helpers.validatePassword(password)
+    rs = validator.validatePassword(password)
     if(!rs[0]){
         statusController.putJSONError(req, res, new Error("Register Error", rs[2], 400, 2));
         console.log("Register user attempt failed since password invalid: " + rs[2]);
         return;
     }
 
-    rs = helpers.validateUsername(username);
+    rs = validator.validateUsername(username);
     if(!rs[0]){
         statusController.putJSONError(req, res, new Error("Register Error", rs[2], 400, 1));
         console.log("Register user attempt failed since username invalid: " + rs[2]);
