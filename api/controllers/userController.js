@@ -198,7 +198,7 @@ exports.login_user = async (req, res) => {
         user = await User.findOne({username: usernameOrEmail});
     }
 
-    if(!userQuerry){
+    if(!user){
         console.log("Login attempt failed since email or username was not found!");
         statusController.putJSONError(req, res, new Error("Login Error", "Invalid Credentials", 403));
         return;

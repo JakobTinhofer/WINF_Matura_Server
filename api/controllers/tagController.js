@@ -19,7 +19,7 @@ exports.getAllTags = async (req, res) => {
 }
 
 exports.createNewTag = async (req, res) => {
-    if(!await userController.require_login(req, res, 5)){
+    if(!await userController.require_login(req, res)){
         console.log("Could not create tag since user not logged in, or sec rank to low.");
         return;
     }
@@ -65,11 +65,11 @@ exports.createNewTag = async (req, res) => {
 }
 
 exports.modifySiteTags = async (req, res) => {
-    if(!await userController.require_login(req, res, 5)) return;
+    if(!await userController.require_login(req, res)) return;
     let { id, tagsToAdd, tagsToRemove } = req.body;
     
 
-    if(tagsToAdd instanceof Array && tagsToRemove instanceof Array && id instanceof String){
+    if(Array.isArray(tagsToAdd) && Array.isArray(tagsToRemove) && id instanceof String){
         const site = await Site.findOne({hex_id: String(id)});
         if(site){
             if(site.author.username !== req.session.username && req.session.sec_level < 8){
