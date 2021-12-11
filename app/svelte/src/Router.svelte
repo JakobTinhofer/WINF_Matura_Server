@@ -93,20 +93,18 @@
 			return;
 		}
 
-		if(await checkSiteVisible(location)){
+		if(await checkSiteVisible(location)[0] === true){
 			active_page = SiteViewer;
 			return;
 		}
 
-		window.addEventListener("load",  () => {
-			Array.prototype.forEach.call(document.getElementsByClassName("animated-point"), elem => {
-				elem.style.visibility  = "hidden";
-			});
-			title = "404: Page not found!";
-			msg_color = "lightblue";
-			subtitle = "Could not locate Page '" + location + "'. Did you misspell the url?";
-			show_home_link = true;
+		Array.prototype.forEach.call(document.getElementsByClassName("animated-point"), elem => {
+			elem.style.visibility  = "hidden";
 		});
+		title = "404: Page not found!";
+		msg_color = "lightblue";
+		subtitle = "Could not locate Page '" + location + "'. Did you misspell the url?";
+		show_home_link = true;
 	}
 
 	window.addEventListener("load", startAnimation);
