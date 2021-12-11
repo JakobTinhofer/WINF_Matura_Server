@@ -496,7 +496,7 @@ input[type=submit]:disabled:hover{
                             buttons: [{text: "Cancel", color: "blue", closesModal: true},
                                         {text: "DELETE", color: "red", float: "right", closesModal: true, returnValue: "delete_confirmed"}]},
                             async (rv) => {
-                                if(rv === "delete_confirmed"){
+                                if(rv[0] === "delete_confirmed"){
                                     let r = await deleteSite(urlParams["id"]);
                                     if(r[0]){
                                         window.location = "pages?sms=1";

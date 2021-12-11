@@ -36,7 +36,6 @@
     }
 
     export function closeModal(rv){
-        console.log("Closing modal");
         modal = undefined;
         onModalChanged();
         if(callback)
@@ -83,7 +82,7 @@
 </style>
 {#if rModal !== undefined}
     <Overlay/>
-    <Modal text="{rModal.text}" heading="{rModal.heading}" buttons="{rModal.buttons}" headerColor="{rModal.headerColor}" onClose="{closeModal}"/>
+    <Modal text="{rModal.text}" heading="{rModal.heading}" fields={rModal.fields} buttons="{rModal.buttons}" headerColor="{rModal.headerColor}" onClose="{closeModal}"/>
 {/if}
 
     
