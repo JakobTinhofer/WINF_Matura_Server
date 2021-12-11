@@ -6,7 +6,8 @@
     import { getOwnUser } from "../../scripts/auth";
 
     export let Site;
-
+    export let deleteSite = () => {};
+    export let sCustomPath = () => {};
     export let do_random_bg = true;
 
     let user;
@@ -84,10 +85,18 @@
         overflow-x: hidden;
     }
 
+    .title{
+        display: inline-block;
+        max-width: 15vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
     .author{
         font-family: 'Roboto', sans-serif;
         font-size: 15px;
-        display: block;
+        display: inline;
         margin-left: 3px;
     }
 
@@ -98,6 +107,7 @@
 
     .publicOrNot{
         font-size: 20px;
+        display: inline;
     }
 </style>
 
@@ -107,10 +117,12 @@
     
     <div class="menu-bar">
         <div class="title_author">
-            <p class="title">{Site.title}</p>
-            <p style="color: {Site.isPublic ? 'green' : 'red'}" class="publicOrNot">{Site.isPublic ? 'public' : 'private'}</p>
+            <p class="title" title={Site.title}>{Site.title}</p>
+            
             <br>
+            <p style="color: {Site.isPublic ? 'green' : 'red'}" class="publicOrNot">{Site.isPublic ? 'public' : 'private'}</p>
             <p class="author">by {Site.author.username}</p>
+            <p class="author" style="color: rgb(40,40,40);">Path: {Site.dir_path_end}</p>
         </div>
         
         <span style="float:right;">
@@ -119,8 +131,9 @@
                 <Dropdown dd_color_on_open="transparent">
                     <i class="fas fa-ellipsis-v"></i>
                     <svelte:fragment slot="dropdown-list-elems">
-                        <NavbarElement>Edit</NavbarElement>
-                        <NavbarElement>Delete</NavbarElement>
+                        <NavbarElement on:click="{window.location= "edit?id=" + Site.hex_id}">Edit</NavbarElement>
+                        <NavbarElement on:click="{deleteSite(Site.hex_id)}">Delete</NavbarElement>
+                        <NavbarElement on:click="{() => {sCustomPath(Site.hex_id);}}">Change Path</NavbarElement>
                     </svelte:fragment>
                 </Dropdown>
             {:else}

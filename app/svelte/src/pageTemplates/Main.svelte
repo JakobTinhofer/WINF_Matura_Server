@@ -67,9 +67,9 @@
     }
 </style>
 
-<head>
+<svelte:head>
     <title>WINF Matura 2021/2022</title>
-</head>
+</svelte:head>
 
 
 <div class="header">

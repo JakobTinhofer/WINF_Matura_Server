@@ -6,13 +6,12 @@
     export let z_index = 1;
 
 
-
-    let overlay_div;
+    let opacity = "0%";
     export let isActive = true;
 
 
     window.addEventListener("load", () => {
-        set_state();
+        set_state(isActive);
     });
 
     
@@ -21,11 +20,11 @@
 
     function set_state(state){
         var bool = convertToBool(state);
-        if(document.readyState === "complete" && overlay_div){
+        if(document.readyState === "complete"){
             if(bool){
-                overlay_div.style.opacity = activeOpacity; 
+                opacity = activeOpacity; 
             }else{
-                overlay_div.style.opacity = "0%";
+                opacity = "0%";
             }
 
         }
@@ -48,4 +47,4 @@
 </style>
 
 
-<div bind:this={overlay_div} style="transition: opacity {secondsTransition}; z-index: {z_index}"  />
+<div style="transition: opacity {secondsTransition}; z-index: {z_index}; opacity: {opacity}"  />

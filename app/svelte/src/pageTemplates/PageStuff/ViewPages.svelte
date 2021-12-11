@@ -1,7 +1,8 @@
 <script>
-import {getSitesWithFilter, getOwnUser} from "../../../scripts/auth";
+import {getSitesWithFilter, getOwnUser, deleteSite, setCustomPath} from "../../../scripts/auth";
 import SiteCard from "../../modules/SiteCard.svelte";
 import Navbar from "../../modules/Navbar.svelte";
+import {displayModal, displayModalAsync, displayStatusMessage} from "../../modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 
 let sites = new Array();
 
@@ -18,6 +19,69 @@ function updateUser(){
     getOwnUser(true).then((res) => {user = res;}, (err) => {console.debug(err);});
 }
 updateUser();
+
+
+function ds(id){
+    displayModal({
+        text: "Clicking on DELETE will remove your page. This action cannot be undone, so I hope you won't change your mind!",
+        heading: "Are you sure?",
+        buttons: [{text: "Cancel", color: "blue", closesModal: true},
+                    {text: "DELETE", color: "red", float: "right", closesModal: true, returnValue: "delete_confirmed"}]
+        },
+        async (rv) => {
+            
+            if(rv[0] === "delete_confirmed"){
+                let r = await deleteSite(id);
+                if(r[0]){
+                    displayStatusMessage("Successfully deleted site.", "green");
+                }else{
+                    displayStatusMessage("Error: " + r[1], "tomato");
+                }
+                getSites();
+            }
+        }
+    );
+    
+}
+const illegalPaths = ["login", "signup", "security", "admin", "createsite", "deletesite", "addsite", "recover"];
+const pathUnsaveChars = /[^a-zöäü0-9-_]/i;
+function validateCustomPath(path){   
+    if(!path || path.length < 4 || path.length > 128){
+        return [false, "The custom path must be between 4 and 128 characters in length!"];
+    }
+    if(pathUnsaveChars.test(path)){
+        return [false, "Please do not use any special chars in your path!"];
+    }
+    if(illegalPaths.includes(path.toLocaleLowerCase())){
+        return [false, "This path is reserved."];
+    }
+    return [true];
+}
+
+async function sCustomPath(id){
+    let r = await displayModalAsync({
+        text: "Choose a new path. Please do not use any special chars!",
+        heading: "Set Custom Path",
+        fields: [{name: "path", validate: validateCustomPath, placeholder: "cool_path_goes_here"}],
+        buttons: [{text: "Cancel", color: "blue", closesModal: true},
+                    {text: "Change Path", color: "green", float: "right", closesModal: true, returnValue: "do_change", requireAllValid: true}]
+    });
+
+    if(r && r[0] === "do_change"){
+        const p = r[1].path.value;
+        if(validateCustomPath(p)[0] === true){
+            let r = await setCustomPath(id, p);
+            if(r[0]){
+                displayStatusMessage("Successfully updated path!", "green");
+                await getSites();
+            }else{
+                displayStatusMessage("Error: " + r[1]);
+            }
+        }else{
+            displayStatusMessage("Your path is invalid! Please try again", "red");
+        }
+    }
+}
 </script>
 
 <style>
@@ -108,7 +172,7 @@ updateUser();
     {#if sites && sites.length > 0}
         {#each sites as s, i}
             {#if !onlyMyPages || !(user && s.author.username !== user.username)}
-                <SiteCard Site={s} />
+                <SiteCard Site={s} deleteSite={ds} {sCustomPath}/>
             {/if}
             
         {/each}

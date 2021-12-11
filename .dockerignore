@@ -7,3 +7,4 @@ app/svelte/package-lock.json
 app/svelte/rollup.config.json
 app/svelte/README.md
 .vscode
+.env

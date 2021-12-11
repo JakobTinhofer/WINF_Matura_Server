@@ -1,6 +1,5 @@
 <script>
 	import Main from "./pageTemplates/Main.svelte";
-	import UserPage from "./pageTemplates/UserPage.svelte";
 	import LoginSignup from "./pageTemplates/LoginSignup.svelte";
 	import VerificationWrapper from "./pageTemplates/VerificationWrapper.svelte";
 	import ForgotPassword from "./pageTemplates/ForgotPassword.svelte";
@@ -8,7 +7,10 @@
 	import ViewPages from "./pageTemplates/PageStuff/ViewPages.svelte";
 	import SiteViewer from "./pageTemplates/PageStuff/SiteViewer.svelte";
 	import { checkSiteVisible } from "../scripts/auth";
+	import { getURLParameters, displayPredefinedSMs } from "../scripts/helpers";
+	import MessageAndModalDisplayer, {displayStatusMessage} from "./modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 	import anime from "animejs/lib/anime.es.js";
+	import ModalTest from "./pageTemplates/ModalTest.svelte";
 
 	let active_page;
 	export let maxDots = 3;
@@ -22,6 +24,14 @@
 	let routed = false;
 	
 	let CustomPaths = [];
+
+	window.addEventListener("load", () => {
+		let params = getURLParameters(window.location.search);
+		if(params["sms"]){
+			displayPredefinedSMs(params["sms"], displayStatusMessage);
+		}
+	});
+	
 
 	export function addCustomPath (path, page){
 		CustomPaths[path] = page;
@@ -55,6 +65,9 @@
 				break;
 			case "/pages":
 				active_page = ViewPages;
+				break;
+			case "/smtest":
+				active_page = ModalTest;
 				break;
 			default:
 				handleUnknown(location);
@@ -99,6 +112,7 @@
 	window.addEventListener("load", startAnimation);
 	startRouting(window.location.pathname);
 
+	
 	let pointsHTML = "";
 	for(let i = 0; i < maxDots; i++){
 		pointsHTML += '<span id="point-' + i + '" class="animated-point" style="opacity:100%; transition: opacity 1s;">.</span>'
@@ -163,7 +177,12 @@
 	}
 
 </style>
-
+<svelte:head>
+	{#if active_page}
+		<title>{title}</title>
+	{/if}
+</svelte:head>
+<MessageAndModalDisplayer/>
 {#if active_page}
 	<svelte:component this={ active_page }/>
 	{#if animId != -1}
@@ -172,9 +191,7 @@
 		</script>
 	{/if}
 {:else}
-		<head>
-			<title>{title}</title>
-		</head>
+		
 		<body>
 			<div>
 				<h1 style="color: {msg_color}">{title} {@html pointsHTML}</h1>

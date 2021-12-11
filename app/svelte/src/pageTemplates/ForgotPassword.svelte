@@ -67,7 +67,6 @@
                         button_message = "Go Login";
                         disableStr = "";
                     }else{
-                        console.debug(res);
                         if(res[2] === 404 || res[2] === 403){
                             page = "resendLink";
                         }
@@ -214,13 +213,13 @@
 {/if}
 
 
-<head>
+<svelte:head>
     {#if window.location.pathname === "/changepassword"}
         <title>Change your Password</title>
     {:else}
         <title>Forgot your password?</title>
     {/if}
-</head>
+</svelte:head>
 
 <div id="main">
     <div id="centred">

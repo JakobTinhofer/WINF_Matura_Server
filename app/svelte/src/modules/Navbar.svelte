@@ -136,12 +136,6 @@
     }
 </style>
 
-
-<head>
-    
-</head>
-
-
  
 <div bind:this="{navbar}" id="navbar">
     <div id="container">
