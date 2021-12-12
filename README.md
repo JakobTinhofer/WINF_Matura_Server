@@ -36,7 +36,7 @@ There are some arguments in order to configure the app:
   This changes the behaviour of the site. Running the app without dev mode is currently not recommended.
 * Gmail Password (-pw --gmail-password --mail-password):
   Sets the password to authenticate to gmail with.
-* Gmail User (-gi --gmail-user --mail-user):
+* Gmail User (-gu --gmail-user --mail-user):
   Sets the user to authenticate to gmail with. Also the address from which all mail is sent. Looks something like this: johndoe@gmail.com
 * Mongo IP (-m --mongo -mip --mongo-ip):
   Tells the app where the database is. Format: \<ip\>:\<port\>. Default: localhost:27017
