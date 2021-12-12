@@ -59,5 +59,5 @@ You can also create a .env file in the directory of the init node file.
 * To set the hostname, use HOSTNAME='\<hostname\>'
 * To set the port, use PORT=\<port\>
 * To set the https port, use HTTPS_PORT=\<port\>
-* To set the ssl key path, use SSLKEY_PATH=\<path/to/key.pem\>
-* To set the ssl certificate path, use SSLCERT_PATH=\<path/to/cert.pem\>
+* To set the ssl key path, use SSLKEY_PATH='\<path/to/key.pem\>'
+* To set the ssl certificate path, use SSLCERT_PATH='\<path/to/cert.pem\>'
