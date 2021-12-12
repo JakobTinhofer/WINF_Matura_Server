@@ -27,7 +27,7 @@ templates.loadTemplate(__dirname + "/templates/verification_message.html", "veri
 templates.loadTemplate(__dirname + "/templates/forgot_password_code.html", "forgot_password_code");
 
 exports.sendVerificationEmail = async (verification) => {
-    let link = "http://" + process.env['HOSTNAME'] + (process.env["PORT"] === 80 ? '' : ':' + process.env["PORT"]) + "/verify?secret=" + verification.secret;
+    let link = generateLink("/verify?secret=" + verification.secret);
     var mailOptions = {
         from: 'WINF 2021 / 2022',
         to: verification.user.email,
@@ -42,7 +42,7 @@ exports.sendVerificationEmail = async (verification) => {
 }
 
 exports.sendForgotPasswordCode = async (user, secret) => {
-    let link = "http://" + process.env['HOSTNAME'] + (process.env["PORT"] === 80 ? '' : ':' + process.env["PORT"]) + "/changepassword?secret=" + secret;
+    let link = generateLink("/changepassword?secret=" + secret);
     var mailOptions = {
         from: 'WINF 2021 / 2022',
         to: user.email,
@@ -56,3 +56,6 @@ exports.sendForgotPasswordCode = async (user, secret) => {
     return await transporter.sendMail(mailOptions);
 }
 
+function generateLink(url){
+    return "http" + (process.env["ENABLE_HTTPS"] ? "s" : "") + "://" + process.env['HOSTNAME'] + (process.env["PORT"] === 80 ? '' : ':' + (process.env["ENABLE_HTTPS"] ? process.env["HTTPS_PORT"] : process.env["PORT"])) + url;
+}
