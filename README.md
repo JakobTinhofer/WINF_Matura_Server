@@ -23,6 +23,7 @@ This webapp functions as kind of a mashup of a web server and blog platform, all
 
 ## Comming Soon
 Features I'd like to implement before this is finished are: 
+* Reactivity improvements. This app should have been developed mobile first :/
 * Tags for Sites
 * Viewers displaying all sites of a tag / multiple tags
 * actual content on the main page
