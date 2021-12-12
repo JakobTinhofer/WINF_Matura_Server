@@ -115,7 +115,10 @@ if(process.env["DEV_MODE"] === "true"){
 if(!process.env["PORT"]){
     console.log("No port provided or port invalid, assuming 3000.");
     process.env["PORT"] = 3000;
-}
+}else
+    process.env["PORT"] = Number(process.env["PORT"])
+
+
 
 if(!process.env["HOSTNAME"]){
     console.log("No hostname provided, assuming localhost.");
