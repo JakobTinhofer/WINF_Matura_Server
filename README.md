@@ -39,7 +39,7 @@ There are some arguments in order to configure the app:
 * Gmail User (-gi --gmail-user --mail-user):
   Sets the user to authenticate to gmail with. Also the address from which all mail is sent. Looks something like this: johndoe@gmail.com
 * Mongo IP (-m --mongo -mip --mongo-ip):
-  Tells the app where the database is. Format: <ip>:<port>. Default: localhost:27017
+  Tells the app where the database is. Format: \<ip\>:\<port\>. Default: localhost:27017
 * Hostname (-h --host):
   The address to used for example in the emails. Default: localhost
 * HTTP Port (-p --port):
