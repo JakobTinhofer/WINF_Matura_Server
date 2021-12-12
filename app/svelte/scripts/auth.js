@@ -135,7 +135,7 @@ async function sendBasicJSONPostRequest(url, obj = {}, redirOnNotLoggedIn = unde
             return [false, resObj.message, resObj.errorCode, res.status];
         }
     }catch(error){
-        showStatusMessage("Error while handling response: " + error);
+        displayStatusMessage("Error while handling response: " + error);
         displayStatusMessage(res, "red");
         throw error;
     }

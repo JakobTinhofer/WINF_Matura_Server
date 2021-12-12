@@ -92,8 +92,7 @@
 			active_page = CustomPaths[location];
 			return;
 		}
-
-		if(await checkSiteVisible(location)[0] === true){
+		if(await checkSiteVisible(location) === true){
 			active_page = SiteViewer;
 			return;
 		}
