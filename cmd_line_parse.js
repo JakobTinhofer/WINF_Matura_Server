@@ -31,6 +31,18 @@ for (let i = 0; i < args.length; i++){
                 process.exit(1);
             }
             break;
+        case "-gu":
+        case "--gmail-user":
+        case "--mail-user":
+            if(i + 1 < args.length && !args[i + 1].startsWith("-")){
+                process.env["GMAIL_USER"] = args[i + 1];
+                i++;
+            }
+            else{
+                console.log("Invalid argument! Either the value provided for gmail user is an argument itsself, or it is not provided!");
+                process.exit(1);
+            }
+            break;
         case "--debug":
         case "--dev":
         case "-d":
@@ -88,6 +100,11 @@ if(!process.env["SITE_PATH"]){
 
 if(!process.env["GMAIL_PASSWORD"]){
     console.log("No gmail password was passed.");
+    process.exit(1);
+}
+
+if(!process.env["GMAIL_USER"]){
+    console.log("No gmail username was passed.");
     process.exit(1);
 }
 
