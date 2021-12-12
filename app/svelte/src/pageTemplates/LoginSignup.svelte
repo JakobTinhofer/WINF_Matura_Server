@@ -411,7 +411,7 @@ import { displayStatusMessage } from "../modules/StatusMessagesAndModals/Message
 
     .card{
         width: 60%;
-        padding:    30px;
+        padding: 30px;
         background-color: white;
         transition: width 0.3s;
         margin: auto;
@@ -560,6 +560,28 @@ import { displayStatusMessage } from "../modules/StatusMessagesAndModals/Message
 
 <svelte:head>
     <title>{heading}</title>
+    <style>
+        @media screen and (max-width:400px) {
+            /* CSS for screens that are 320 pixels or less will be put in this section */
+            * {
+                font-size: 12px;
+            }
+            h1{
+                font-size: 35px !important;
+            }
+            .card{
+                padding: 15px !important;
+            }
+            .width-80 p{
+                display: block !important;
+                padding: 0px !important;
+                margin-bottom: 5px !important;
+            }
+            .width-80 a{
+                float: left !important;
+            }
+        } 
+    </style>
 </svelte:head>
 
 <div id="main">
@@ -599,7 +621,7 @@ import { displayStatusMessage } from "../modules/StatusMessagesAndModals/Message
                 </form>
             {:else}
             <form on:change="{validateSignup}"  on:submit="{submitSignup}">
-                <label for="email">Email (you will need to activate your account): </label>
+                <label for="email">Email (activation needed): </label>
                 <input type="text" on:keyup="{validateSignupNotStrict}" placeholder="Email" id="email" class="emailUsernamePassword box_shadow_light {signup_classes['email']}" bind:value="{email}" name="email" disabled={__di_str}/>
                 <label for="username">Username: </label>
                 <input type="text" on:keyup="{validateSignupNotStrict}" placeholder="Username" id="username" class="emailUsernamePassword box_shadow_light {signup_classes['username']}" bind:value="{username}" name="username" disabled={__di_str}/>

@@ -89,6 +89,17 @@
         font-size: 25px;
     }
 
+    @media screen and (max-width:500px) {
+        /* CSS for screens that are 320 pixels or less will be put in this section */
+        #generelle-infos p{
+            font-size: 15px;
+        }
+
+        .header h1{
+            font-size: 40px;
+        }
+    } 
+
     section{
         height: 100vh;
         scroll-snap-align: center;
@@ -122,8 +133,17 @@
         height: 100vh;
         scroll-snap-type: y mandatory;
         padding-right: 20px;
-        
     }
+
+    @media screen and (max-width:400px) {
+        /* CSS for screens that are 320 pixels or less will be put in this section */
+        .parent{
+            overflow-x: hidden !important;
+            padding-right: 0px !important;
+        }
+    } 
+    
+    
     .parent section{
         width: 100vw;
     }
