@@ -46,8 +46,8 @@ There are some arguments in order to configure the app:
  
 You can also create a .env file in the directory of the init node file.
 * To set dev mode, use DEV_MODE=true
-* To set the gmail password, use GMAIL_PASSWORD='<password>'
-* To set the gmail user, use GMAIL_USER='<email address>'
-* To set the mongo ip, use MONGO_IP='<ip>:<port>'
-* To set the hostname, use HOSTNAME='<hostname>'
-* To set the port, use PORT=<port>
+* To set the gmail password, use GMAIL_PASSWORD='\<password\>'
+* To set the gmail user, use GMAIL_USER='\<email address\>'
+* To set the mongo ip, use MONGO_IP='\<ip\>:\<port\>'
+* To set the hostname, use HOSTNAME='\<hostname\>'
+* To set the port, use PORT=\<port\>
