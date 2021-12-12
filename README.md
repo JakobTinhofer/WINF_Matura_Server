@@ -24,5 +24,14 @@ This webapp functions as kind of a mashup of a web server and blog platform, all
 Features I'd like to implement before this is finished are: 
 * Tags for Sites
 * Viewers displaying all sites of a tag / multiple tags
-* acutual content on the main page
+* actual content on the main page
 * HTTPS (this should be quite easy but I am also quite lazy sooo)
+
+
+## Command Line Args and so on
+There are some arguments in order to configure the app:
+
+* Dev Mode (-d --dev --debug):
+  This changes the behaviour of the site. Running the app without dev mode is currently not recommended.
+* Gmail Password (-pw --gmail-password --mail-password):
+  Sets the password to authenticate to gmail with. 
