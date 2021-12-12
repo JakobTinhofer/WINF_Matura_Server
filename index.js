@@ -62,7 +62,7 @@ async function generateSessionSecret(){
 async function setUpHTTP(){
     let s = http.createServer(app);
     process.env["SERVER"] = s;
-    s.listen(process.env["PORT"], process.env["HOSTNAME"])
+    s.listen(process.env["PORT"], '0.0.0.0')
     console.log("--> HTTP server listening on " + process.env["HOSTNAME"] + ":" + process.env["PORT"] + "...");
 }
 
@@ -91,7 +91,7 @@ async function setUpHTTPS(){
     var creds = {key: privateKey, cert: certificate}
     let s = https.createServer(creds, app);
     process.env["SERVER"] = s;
-    s.listen(process.env["HTTPS_PORT"], process.env["HOSTNAME"]);
+    s.listen(process.env["HTTPS_PORT"], '0.0.0.0');
     console.log("--> Started HTTPS server on " + process.env["HOSTNAME"] + ":" + process.env["HTTPS_PORT"] + "...")
     await setUpHTTPRedirect(process.env["HOSTNAME"], process.env["PORT"])
 }
@@ -101,7 +101,7 @@ async function setUpHTTPS(){
 async function setUpHTTPRedirect(host, port){
     http.createServer(express().use((req, res, next) => {
         res.redirect("https://" + host + (process.env["HTTPS_PORT"] ? (":" + process.env["HTTPS_PORT"]) : "") + req.url);
-    }).listen(port, host));
+    }).listen(port, '0.0.0.0'));
     console.log("--> Set up http to https redirect on port " + host + ":" + port + "...");
 }
 
