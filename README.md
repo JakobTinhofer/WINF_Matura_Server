@@ -34,4 +34,20 @@ There are some arguments in order to configure the app:
 * Dev Mode (-d --dev --debug):
   This changes the behaviour of the site. Running the app without dev mode is currently not recommended.
 * Gmail Password (-pw --gmail-password --mail-password):
-  Sets the password to authenticate to gmail with. 
+  Sets the password to authenticate to gmail with.
+* Gmail User (-gi --gmail-user --mail-user):
+  Sets the user to authenticate to gmail with. Also the address from which all mail is sent. Looks something like this: johndoe@gmail.com
+* Mongo IP (-m --mongo -mip --mongo-ip):
+  Tells the app where the database is. Format: <ip>:<port>. Default: localhost:27017
+* Hostname (-h --host):
+  The address to used for example in the emails. Default: localhost
+* Port (-p --port):
+ The port on which this app should listen. Default: 3000
+ 
+You can also create a .env file in the directory of the init node file.
+* To set dev mode, use DEV_MODE=true
+* To set the gmail password, use GMAIL_PASSWORD='<password>'
+* To set the gmail user, use GMAIL_USER='<email address>'
+* To set the mongo ip, use MONGO_IP='<ip>:<port>'
+* To set the hostname, use HOSTNAME='<hostname>'
+* To set the port, use PORT=<port>
