@@ -119,7 +119,7 @@ exports.createSite  = async (req, res) => {
         console.log(s);
         s.save();
     
-        console.log("Successfully created new site! Site id: " +siteId);
+        console.log("Successfully created new site! Site id: " + siteId);
         statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully created new site", siteId));
     });
 
