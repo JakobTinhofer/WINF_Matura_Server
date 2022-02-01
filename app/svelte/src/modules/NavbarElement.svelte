@@ -1,6 +1,4 @@
 <script>
-    import { createCSSSelector } from "../../scripts/helpers";
-
     let fs = "20px";
     export let float = "";
 

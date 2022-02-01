@@ -1,6 +1,5 @@
 const userController = require("../controllers/userController");
 const forgotPasswordController = require("../controllers/forgotPasswordController");
-const express = require('express');
 const rateLimit = require("express-rate-limit");
 var router = require('express').Router();
 

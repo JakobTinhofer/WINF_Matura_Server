@@ -1,5 +1,4 @@
 let mongoose = require("mongoose");
-const User = require("./User").schema;
 let siteSchema = mongoose.Schema({
   author:{
       type: Object,
