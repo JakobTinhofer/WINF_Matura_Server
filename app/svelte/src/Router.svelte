@@ -41,6 +41,8 @@
 	}
 
 	function startRouting(location){
+		if(location[location.length - 1] === "/") location = location.substring(0, location.length - 1);
+		console.log(location);
 		switch (String(location).toLocaleLowerCase()) {
 			case "/login":
 			case "/signup":
@@ -55,8 +57,8 @@
 			case "":
 				active_page = Main;
 				break;
-			case "/edit":
-			case "/create":
+			case "/pages/edit":
+			case "/pages/create":
 				active_page = CreateOrEditPage;
 				break;
 			case "/forgotpassword":

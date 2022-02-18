@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { exit } = require('process');
+const { exit, env } = require('process');
 require("dotenv").config();
 var args = process.argv.slice(2);
 
@@ -16,6 +16,26 @@ for (let i = 0; i < args.length; i++){
             }
             else{
                 console.log("Invalid argument! Either the value provided for mongo ip is an argument itsself, or it is not provided!");
+                process.exit(1);
+            }
+            break;
+        case "--dbPassword":
+            if(i + 1 < args.length && !args[i + 1].startsWith("-")){
+                process.env["DB_PW"] = args[i + 1];
+                i++;
+            }
+            else{
+                console.log("Invalid argument! Either the value provided for mongo password is an argument itsself, or it is not provided!");
+                process.exit(1);
+            }
+            break;
+        case "--dbUser":
+            if(i + 1 < args.length && !args[i + 1].startsWith("-")){
+                process.env["DB_USER"] = args[i + 1];
+                i++;
+            }
+            else{
+                console.log("Invalid argument! Either the value provided for mongo username is an argument itsself, or it is not provided!");
                 process.exit(1);
             }
             break;
@@ -142,6 +162,9 @@ for (let i = 0; i < args.length; i++){
 if(!process.env["SITE_PATH"]){
     console.log("Please add the --site_path argument.");
     process.exit(1);
+}else if(!fs.existsSync(process.env["SITE_PATH"])){
+    console.log("Site path '" + process.env["SITE_PATH"] + "' does not seem to exist!");
+    process.exit(1);
 }
 
 if(!process.env["GMAIL_PASSWORD"]){
@@ -182,4 +205,10 @@ if(!process.env["HTTPS_PORT"] && process.env["ENABLE_HTTPS"]){
     let p = process.env["DEV_MODE"] ? 8080 : 443;
     console.log("No https port provided, using default port " + p + ".");
     process.env["HTTPS_PORT"] = p;
+}
+
+
+if(!(process.env["DB_PW"] && process.env["DB_USER"])){
+    console.log("ERROR: No database user / password set! Aborting...");
+    process.exit(403);
 }

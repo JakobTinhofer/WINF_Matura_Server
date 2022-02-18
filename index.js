@@ -83,7 +83,7 @@ async function setUpHTTPS(){
         console.log("----> Trying to read ssl certificate.");
         certificate = fs.readFileSync(process.env["SSLCERT_PATH"]);
     }catch(error){
-        console.log("Error while reading SSL files. Maybe the right permissions have not been set? Error: " + err);
+        console.log("Error while reading SSL files. Maybe the right permissions have not been set? Error: " + error);
         process.exit(-551);
         return;
     }
