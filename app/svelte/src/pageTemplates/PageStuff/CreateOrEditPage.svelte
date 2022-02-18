@@ -1,5 +1,6 @@
 <script>
 import FileIcon from "../../modules/FileIcon.svelte";
+import BreadCrumbs from "../../modules/BreadCrumbs.svelte";
 import { createNewSite, getEditFields, checkLoggedIn, sendEditRequest, deleteSite } from "../../../scripts/auth";
 import { getURLParameters } from "../../../scripts/helpers";
 import MessageAndModalDisplayer, {displayModal, displayModalAsync, displayStatusMessage} from "../../modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
@@ -14,7 +15,7 @@ let urlParams = getURLParameters(window.location.search);
 
 
 
-let isEdit = window.location.pathname === "/edit";
+let isEdit = window.location.pathname.split().pop() === "edit";
 let isValid = false; 
 let disableInput = false;
 let displaySuccessPage = false;
@@ -416,7 +417,8 @@ input[type=submit]:disabled:hover{
 <svelte:head>
     <title>{isEdit ? "Edit a page" : "Create a new page"}</title>
 </svelte:head>
-
+<BreadCrumbs>
+</BreadCrumbs>
 
 {#if displaySuccessPage}
     <div id="header">

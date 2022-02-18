@@ -8,6 +8,7 @@
     import {isEmail, isValidUsername, invalidCharacterMessage, convertToBool, getURLParameters} from "../../scripts/helpers";
 
     import {checkLoggedIn, tryLogIn, logOut, trySignUp} from "../../scripts/auth";
+    import BreadCrumbs from "../modules/BreadCrumbs.svelte";
 
     import LoadingSpinner from "../modules/LoadingSpinner.svelte";
 
@@ -583,7 +584,8 @@ import { displayStatusMessage } from "../modules/StatusMessagesAndModals/Message
         } 
     </style>
 </svelte:head>
-
+<BreadCrumbs>
+</BreadCrumbs>
 <div id="main">
     <div id="centred">
         <div class="card box_shadow_light">

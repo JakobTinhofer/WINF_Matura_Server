@@ -132,7 +132,7 @@
                 <Dropdown dd_color_on_open="transparent">
                     <i class="fas fa-ellipsis-v"></i>
                     <svelte:fragment slot="dropdown-list-elems">
-                        <NavbarElement on:click="{window.location= "edit?id=" + Site.hex_id}">Edit</NavbarElement>
+                        <NavbarElement on:click="{window.location= "/pages/edit?id=" + Site.hex_id}">Edit</NavbarElement>
                         <NavbarElement on:click="{deleteSite(Site.hex_id)}">Delete</NavbarElement>
                         <NavbarElement on:click="{() => {sCustomPath(Site.hex_id);}}">Change Path</NavbarElement>
                     </svelte:fragment>

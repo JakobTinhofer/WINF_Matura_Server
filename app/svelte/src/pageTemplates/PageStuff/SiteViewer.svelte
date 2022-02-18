@@ -1,6 +1,6 @@
 <script>
 import { getSiteByPath } from '../../../scripts/auth';
-
+import BreadCrumbs from "../../modules/BreadCrumbs.svelte";
 
 let path = "/api/sites" + location.pathname;
 
@@ -44,6 +44,8 @@ iframe{
 <svelte:head>
     <title>{siteTitle}</title>
 </svelte:head>
+<BreadCrumbs>
+</BreadCrumbs>
 <div>
     <iframe src="{path}" title="site"/>
 </div>

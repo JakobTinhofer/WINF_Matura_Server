@@ -4,6 +4,7 @@
     import Dropdown from "../modules/Dropdown.svelte";
     import {checkLoggedIn, logOut, getOwnUser} from "../../scripts/auth";
     import Overlay from "../modules/Overlay.svelte";
+    import MessageAndModalDisplayer, {displayStatusMessage, displayModal, displayModalAsync} from "../modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 
     let loggedIn;
     
@@ -35,7 +36,7 @@
     }
 
     function logOutClicked(){
-        console.log("Clicked.");
+        displayStatusMessage("Successfully logged out.", "lightblue");
         logOut().then((res) => {updateLoggedIn()}, ex => {console.debug(ex);})
     }
 
@@ -93,6 +94,13 @@
         /* CSS for screens that are 320 pixels or less will be put in this section */
         #generelle-infos p{
             font-size: 15px;
+        }
+        #generelle-infos {
+            width: 80% !important;
+        }
+        #generelle-infos h1{
+            font-size: 20px;
+            text-align: center;
         }
 
         .header h1{
@@ -157,7 +165,7 @@
         }
     </style>
 </svelte:head>
-
+<MessageAndModalDisplayer></MessageAndModalDisplayer>
 <div class="parent">
     <section class="header">
         <Navbar>

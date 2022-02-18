@@ -15,6 +15,9 @@
         font-size: 2.5vw;
         margin: 0px;
         font-family: 'Roboto', sans-serif;
+        overflow: hidden;
+        text-overflow: clip;
+        white-space: nowrap;
     }
 
     div:hover{

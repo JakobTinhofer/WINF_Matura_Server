@@ -4,6 +4,7 @@ import SiteCard from "../../modules/SiteCard.svelte";
 import Navbar from "../../modules/Navbar.svelte";
 import {displayModal, displayModalAsync, displayStatusMessage} from "../../modules/StatusMessagesAndModals/MessageAndModalDisplayer.svelte";
 import * as validator from '../../../../../common/validators'
+import BreadCrumbs from "../../modules/BreadCrumbs.svelte"; 
 let sites = new Array();
 
 async function getSites(){
@@ -151,14 +152,16 @@ async function sCustomPath(id){
 }
 </style>
 
-
+    
     <h1 id="header">
         Sites
     </h1>
+    <BreadCrumbs>
+    </BreadCrumbs>
     <div id="menu_bar">
         <Navbar basic_bg_color="royalblue" sidebar_width="80%">
             <div class="pdng">
-                <a href="create"><i class="fas fa-plus"></i> Create New Page</a>
+                <a href="/pages/create"><i class="fas fa-plus"></i> Create New Page</a>
             </div>
             <div class="pdng" id="chck_bx">
                 <label for="onlyMyPages">Only my pages:</label>

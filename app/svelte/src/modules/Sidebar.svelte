@@ -58,6 +58,7 @@
         padding-left: 0px !important;
         text-align: center;
         padding-right: 0px !important;
+        overflow-x: hidden;
     }
     div i{
         padding: 20px 0px;
