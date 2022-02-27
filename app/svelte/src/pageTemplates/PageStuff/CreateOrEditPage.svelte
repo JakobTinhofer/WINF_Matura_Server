@@ -226,7 +226,7 @@ async function submitCreate(){
     let r = await createNewSite(title.value, fileList, isPublic, startPage.value);
     console.log(r[1]);
     if(r[0]){ 
-        redirect = r[1];
+        redirect = "/" + [1];
         displaySuccessPage = true;
     }else{ 
         errorPrinting(r);
