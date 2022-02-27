@@ -120,9 +120,10 @@ async function setUpHTTPS(){
 async function setUpHTTPRedirect(host, port){
     console.log("--> Set up http to https redirect on port " + host + ":" + port + "...");
     return new Promise(rlv => {
-        http.createServer(express().use((req, res, next) => {
-            res.redirect("https://" + host + (process.env["HTTPS_PORT"] ? (":" + process.env["HTTPS_PORT"]) : "") + req.url);
-        }).listen(port, '0.0.0.0', rs => resolve(rs)));    
+        var server = http.createServer(express().use((req, res) => {
+            res.redirect("https://" + host + (process.env["HTTPS_PORT"] != undefined ? (":" + process.env["HTTPS_PORT"]) : "") + req.url);
+        }));
+        server.listen({port: port, host: '0.0.0.0', callback: (rs) => {resolve(rs)}});    
     });
 }
 
