@@ -15,7 +15,7 @@ getSites();
  
 let user;
 let onlyMyPages = true;
-
+let sb_collapsed;
 function updateUser(){
     getOwnUser(true).then((res) => {user = res;}, (err) => {console.debug(err);});
 }
@@ -97,10 +97,6 @@ async function sCustomPath(id){
     font-size: 40px;
 }
 
-#pages_list{
-    display: block;
-}
-
 #header{
     text-align: center;
     padding: 50px;
@@ -150,16 +146,41 @@ async function sCustomPath(id){
     color: white;
     display: inline-block;
 }
+
 </style>
 
-    
+<svelte:head>
+    <style>
+        @media screen and (min-width:1575px) {
+            #pages_list > div{
+                width: 22% !important;
+            }
+        }
+        @media screen and (min-width: 1220px) and (max-width: 1574px){
+            #pages_list > div{
+                width: 30% !important;
+            }
+        }
+        @media screen and (min-width: 850px) and (max-width: 1219px){
+            #pages_list > div{
+                width: 45% !important;
+            }
+        }
+        @media screen and (max-width: 849px){
+            #pages_list > div{
+                width: calc(100% - 40px) !important;
+                display: block;
+            }
+        }
+    </style>
+</svelte:head>
     <h1 id="header">
         Sites
     </h1>
     <BreadCrumbs>
     </BreadCrumbs>
-    <div id="menu_bar">
-        <Navbar basic_bg_color="royalblue" sidebar_width="80%">
+    <div id="menu_bar" style="background-color: {sb_collapsed ? "#3f3f3f": "transparent"};">
+        <Navbar bind:collapsed="{sb_collapsed}" sidebar_width="80%">
             <div class="pdng">
                 <a href="/pages/create"><i class="fas fa-plus"></i> Create New Page</a>
             </div>
@@ -167,21 +188,21 @@ async function sCustomPath(id){
                 <label for="onlyMyPages">Only my pages:</label>
                 <input type="checkbox" id="onlyMyPages" style="margin-left: 10px;" on:click="{() => {onlyMyPages = !onlyMyPages}}" checked/>   
             </div>
-            
-            
         </Navbar>
-        
     </div>
-    <div id="pages_list">
-    {#if sites && sites.length > 0}
-        {#each sites as s, i}
-            {#if !onlyMyPages || !(user && s.author.username !== user.username)}
-                <SiteCard Site={s} deleteSite={ds} {sCustomPath}/>
-            {/if}
-            
-        {/each}
-    {:else}
-        <p id="no_pages_found">No Sites Found.</p>
-    {/if}
+    <div>
+                <div id="pages_list">
+                    {#if sites && sites.length > 0}
+                        {#each sites as s, i}
+                            {#if !onlyMyPages || !(user && s.author.username !== user.username)}
+                                <SiteCard Site={s} deleteSite={ds} {sCustomPath}/>
+                            {/if}
+                            
+                        {/each}
+                    {:else}
+                        <p id="no_pages_found">No Sites Found.</p>
+                    {/if}
+        </div>
     </div>
+    
 

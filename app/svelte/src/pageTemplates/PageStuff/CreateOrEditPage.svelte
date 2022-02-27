@@ -15,7 +15,7 @@ let urlParams = getURLParameters(window.location.search);
 
 
 
-let isEdit = window.location.pathname.split().pop() === "edit";
+let isEdit = window.location.pathname.split("/").pop() === "edit";
 let isValid = false; 
 let disableInput = false;
 let displaySuccessPage = false;
@@ -158,7 +158,12 @@ function validateFiles(silent){
 function validateTitle(){
     title_message = ""
     if(title.value.length < 4){
-        title_message = "Your title needs to be at least 4 characters long";
+        title_message = "Your title needs to be at least 4 characters long.";
+        title_valid = false;
+        return false;
+    }
+    if(title.value.length > 40){
+        title_message = "Your title needs to be shorter then 40 characters.";
         title_valid = false;
         return false;
     }

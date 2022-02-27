@@ -2,7 +2,7 @@ const {ConnectionString, parseHost} = require('connection-string');
 const mongoose = require("mongoose");
 
 
-const cs = new ConnectionString('mongodb://' + (process.env["MONGO_IP"] ?? "localhost:27017"), {
+const cs = new ConnectionString('mongodb://' + (process.env["MONGO_IP"] == undefined ? "localhost:27017" : process.env["MONGO_IP"]), {
     user: process.env["DB_USER"],
     password: process.env["DB_PW"],
     path: ['winf_web_server'],

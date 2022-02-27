@@ -10,8 +10,17 @@
     export let deleteSite = () => {};
     export let sCustomPath = () => {};
     export let do_random_bg = true;
-
+    let menubar;
     let user;
+    let ta_w = "100%";
+
+    function updateTAW(){
+        ta_w = (menubar == undefined ? "100%" : ((menubar.clientWidth - 55) + "px"));
+    }
+
+    updateTAW();
+    window.addEventListener("resize", updateTAW);
+
 
     function updateUser(){
         getOwnUser(true).then((res) => {user = res;}, (err) => {displayStatusMessage("Error: " + err, "red");});
@@ -26,11 +35,9 @@
         display: inline-block;
         margin: 20px;
         transition: 0.4s;
-        width: 80vw;
         background-color: white;
-        position: relative;
         border-radius: 15px;
-        max-width: 400px;
+        min-width: 20vw;
         font-family: "Roboto", sans-serif;
         box-shadow: 0 1px 2px rgba(0,0,0,0.07), 
                 0 2px 4px rgba(0,0,0,0.07), 
@@ -53,7 +60,8 @@
     }
 
     .menu-bar{
-        
+        display: block;
+        position: relative;
         font-size: 30px;
         padding: 20px 0px 10px 10px;
     }
@@ -61,8 +69,6 @@
     .menu-bar i{
         transition: color 0.4s;
         font-size: 40px;
-
-        padding: 10px 20px 10px 40px;
         color: rgb(100, 98, 98);
     }
 
@@ -81,17 +87,18 @@
     }
 
     .title_author{
-        display: inline-block;
-        max-width: 60vw;
+        display: inline;
         overflow-x: hidden;
+        margin-right: 36px;
+        max-width: 93%;
     }
 
     .title{
-        display: inline-block;
-        max-width: 15vw;
         overflow: hidden;
+        display: block;
         text-overflow: ellipsis;
         white-space: nowrap;
+        max-width: 85%;
     }
 
     .author{
@@ -110,24 +117,27 @@
         font-size: 20px;
         display: inline;
     }
+    span{
+        position: absolute;
+        bottom: 50%;
+        right: 5%;
+        transform: translate(0, 50%);
+    }
 </style>
 
 
 <div class="box_shadow_light card">
     <div class="img" on:click="{() => { window.location = "/" + Site.dir_path_end + "/"}}" style="{do_random_bg ? 'background-color:' + getRandomColor() : ''}"></div>
     
-    <div class="menu-bar">
+    <div class="menu-bar" bind:this="{menubar}">
         <div class="title_author">
             <p class="title" title={Site.title}>{Site.title}</p>
-            
-            <br>
             <p style="color: {Site.isPublic ? 'green' : 'red'}" class="publicOrNot">{Site.isPublic ? 'public' : 'private'}</p>
             <p class="author">by {Site.author.username}</p>
             <p class="author" style="color: rgb(40,40,40);">Path: {Site.dir_path_end}</p>
         </div>
         
-        <span style="float:right;">
-            
+        <span>
             {#if user && Site.author.username === user.username}
                 <Dropdown dd_color_on_open="transparent">
                     <i class="fas fa-ellipsis-v"></i>
