@@ -22,6 +22,16 @@ async function initialize(){
         await setUpHTTP();
         console.log("Started HTTP server.");
     }
+    console.log("Trying to drop root privilege if given...");
+
+    // Root priv's needed to listen at low ports, but keeping those privs is high risk (vuln in app could lead to root access!)
+    try{
+        process.setgid("winf_app");
+        process.setuid("winf_app");
+        console.log("Successfully dropped priviledges. Now running as winf_app.");
+    }catch{
+        console.log("Could not drop root priviledges. Maybe we're already not root? Continuing anyways...");
+    }
 }
 
 async function setMiddleWare(){
