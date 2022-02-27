@@ -122,7 +122,7 @@ async function setUpHTTPRedirect(host, port){
     return new Promise(rlv => {
         http.createServer(express().use((req, res, next) => {
             res.redirect("https://" + host + (process.env["HTTPS_PORT"] ? (":" + process.env["HTTPS_PORT"]) : "") + req.url);
-        })).listen(port, '0.0.0.0', rs => resolve(rs));    
+        }).listen(port, '0.0.0.0', rs => resolve(rs)));    
     });
 }
 
