@@ -6,6 +6,7 @@ const sessions = require('express-session');
 const bcrypt = require('bcrypt');
 const app = express();
 var http = require('http');
+const { resolve } = require('path');
 initialize();
 
 async function initialize(){
@@ -22,6 +23,10 @@ async function initialize(){
         await setUpHTTP();
         console.log("Started HTTP server.");
     }
+    
+}
+
+function dropPrivs(){
     console.log("Trying to drop root privilege if given...");
 
     // Root priv's needed to listen at low ports, but keeping those privs is high risk (vuln in app could lead to root access!)
@@ -33,6 +38,7 @@ async function initialize(){
         console.log("Could not drop root priviledges. Maybe we're already not root? Continuing anyways...");
     }
 }
+
 
 async function setMiddleWare(){
     app.use(cookieParser());
@@ -72,7 +78,9 @@ async function generateSessionSecret(){
 async function setUpHTTP(){
     let s = http.createServer(app);
     process.env["SERVER"] = s;
-    s.listen(process.env["PORT"], '0.0.0.0')
+    s.listen(process.env["PORT"], '0.0.0.0', () => {
+        dropPrivs();
+    });
     console.log("--> HTTP server listening on " + process.env["HOSTNAME"] + ":" + process.env["PORT"] + "...");
 }
 
@@ -102,17 +110,20 @@ async function setUpHTTPS(){
     let s = https.createServer(creds, app);
     process.env["SERVER"] = s;
     s.listen(process.env["HTTPS_PORT"], '0.0.0.0');
-    console.log("--> Started HTTPS server on " + process.env["HOSTNAME"] + ":" + process.env["HTTPS_PORT"] + "...")
-    await setUpHTTPRedirect(process.env["HOSTNAME"], process.env["PORT"])
+    console.log("--> Started HTTPS server on " + process.env["HOSTNAME"] + ":" + process.env["HTTPS_PORT"] + "...");
+    await setUpHTTPRedirect(process.env["HOSTNAME"], process.env["PORT"]);
+    dropPrivs();
 }
 
 
 
 async function setUpHTTPRedirect(host, port){
-    http.createServer(express().use((req, res, next) => {
-        res.redirect("https://" + host + (process.env["HTTPS_PORT"] ? (":" + process.env["HTTPS_PORT"]) : "") + req.url);
-    }).listen(port, '0.0.0.0'));
     console.log("--> Set up http to https redirect on port " + host + ":" + port + "...");
+    return new Promise(rlv => {
+        http.createServer(express().use((req, res, next) => {
+            res.redirect("https://" + host + (process.env["HTTPS_PORT"] ? (":" + process.env["HTTPS_PORT"]) : "") + req.url);
+        })).listen(port, '0.0.0.0', rs => resolve(rs));    
+    });
 }
 
 
