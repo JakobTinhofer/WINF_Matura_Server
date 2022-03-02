@@ -220,22 +220,22 @@ exports.getSiteContent = async (req, res) => {
 
 exports.getVisibleSitesByFilter = async (req, res) => {
     const {filter} = req.body;
-
-    if(!await userController.require_login(req, res)){
-        console.log("Couldn't query pages since user not logged in.");
-        return;
-    }
-
+    
     if(filter){
         console.log("Filter not yet implemented.");
         statusController.putJSONError(req, res, new Error("Get Pages Error", "Filters are not yet implemented. Sorry.", 501, -100));
         return;
     }
-
-    let pages = await Site.find({ $or: [{"author.username": req.session.user.username}, {isPublic: true}]});
-
+    let pages;
+    if(req.session.authenticated === 1){
+        pages = await Site.find({ $or: [{"author.username": req.session.user.username}, {isPublic: true}]});
+        console.log(`User ${req.session.user.username} retrieved ${pages.length} sites.`);
+    }else{
+        pages = await Site.find({isPublic: true});
+        console.log(`Anonymous user retrieved ${pages.length} sites.`);
+    }
     statusController.putJSONSuccess(req, res, new SuccessMessage("Successfully retrieved sites.", pages));
-    console.log(`User ${req.session.user.username} retrieved ${pages.length} sites.`);
+    
 }
 
 exports.getEditFields = async (req, res) => {

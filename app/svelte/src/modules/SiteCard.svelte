@@ -10,8 +10,9 @@
     export let deleteSite = () => {};
     export let sCustomPath = () => {};
     export let do_random_bg = true;
+    export let user;
     let menubar;
-    let user;
+
     let ta_w = "100%";
 
     function updateTAW(){
@@ -20,12 +21,6 @@
 
     updateTAW();
     window.addEventListener("resize", updateTAW);
-
-
-    function updateUser(){
-        getOwnUser(true).then((res) => {user = res;}, (err) => {displayStatusMessage("Error: " + err, "red");});
-    }
-    updateUser();
     </script>
 <!-- https://neumorphism.io/#e0e0e0 -->
 <style>

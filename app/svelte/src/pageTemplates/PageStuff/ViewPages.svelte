@@ -44,21 +44,6 @@ function ds(id){
     );
     
 }
-/*
-const illegalPaths = ["login", "signup", "security", "admin", "createsite", "deletesite", "addsite", "recover"];
-const pathUnsaveChars = /[^a-zöäü0-9-_]/i;
-function validateCustomPath(path){   
-    if(!path || path.length < 4 || path.length > 128){
-        return [false, "The custom path must be between 4 and 128 characters in length!"];
-    }
-    if(pathUnsaveChars.test(path)){
-        return [false, "Please do not use any special chars in your path!"];
-    }
-    if(illegalPaths.includes(path.toLocaleLowerCase())){
-        return [false, "This path is reserved."];
-    }
-    return [true];
-}*/
 
 async function sCustomPath(id){
     let r = await displayModalAsync({
@@ -184,24 +169,25 @@ async function sCustomPath(id){
             <div class="pdng">
                 <a href="/pages/create"><i class="fas fa-plus"></i> Create New Page</a>
             </div>
-            <div class="pdng" id="chck_bx">
-                <label for="onlyMyPages">Only my pages:</label>
-                <input type="checkbox" id="onlyMyPages" style="margin-left: 10px;" on:click="{() => {onlyMyPages = !onlyMyPages}}" checked/>   
-            </div>
+            {#if user !== undefined}
+                <div class="pdng" id="chck_bx">
+                    <label for="onlyMyPages">Only my pages:</label>
+                    <input type="checkbox" id="onlyMyPages" style="margin-left: 10px;" on:click="{() => {onlyMyPages = !onlyMyPages}}" checked/>   
+                </div>
+            {/if}
         </Navbar>
     </div>
     <div>
-                <div id="pages_list">
-                    {#if sites && sites.length > 0}
-                        {#each sites as s, i}
-                            {#if !onlyMyPages || !(user && s.author.username !== user.username)}
-                                <SiteCard Site={s} deleteSite={ds} {sCustomPath}/>
-                            {/if}
-                            
-                        {/each}
-                    {:else}
-                        <p id="no_pages_found">No Sites Found.</p>
+        <div id="pages_list">
+            {#if sites && sites.length > 0}
+                {#each sites as s, i}
+                    {#if !onlyMyPages || !(user && s.author.username !== user.username)}
+                        <SiteCard Site={s} deleteSite={ds} {sCustomPath} {user}/>
                     {/if}
+                {/each}
+            {:else}
+                <p id="no_pages_found">No Sites Found.</p>
+            {/if}
         </div>
     </div>
     
