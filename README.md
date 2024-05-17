@@ -1,9 +1,13 @@
+# THIS PROJECT IS ARCHIVED. 
+The project should still be functional with all the features described below, but is no longer maintained. This also means that the used packages have not been updated and may contain security vulnerabilities not known at the time of developing. Also, the code was written quite a while ago and under different circumstances (for a school project), and therefore does not really live up to my current standards (even though it is fully functional), which is why I have archived this repo. 
+
+
 # WINF Matura 2021/2022
 A small webapp providing an overview of the matura topics for informatics in the schoolyear of 2021/2022. When finished, this webapp should allow for blog-like activities. 
 
 This Project was realized on the MESN-Stack (MongoDB, Express.js, Svelte.js and Node.js) and is mainly an experiment for me to explore these technologies
 
-DISCLAMER: This project is more of a personal project / experiment with technologies new for me. A lot of the code here is terrible, since this is a learning process. But still, this code (mostly) works. If you find an issue, feel free to let me know! :)
+DISCLAMER: This project is more of a personal project / experiment with technologies new for me. A lot of the code here is not on the level of my other projects (or my work), since this is just a small experiment in a way. Nonetheless, everything works fine. 
 
 ## Features
 This webapp functions as kind of a mashup of a web server and blog platform, allowing users to create Sites to which they can upload arbitrary files! (Sounds dangerous, probably is). These are some of the functionalities as of now:
@@ -21,9 +25,8 @@ This webapp functions as kind of a mashup of a web server and blog platform, all
 * Run the server in HTTPS
 
 
-## Comming Soon
-Features I'd like to implement before this is finished are: 
-* Reactivity improvements. This app should have been developed mobile first :/
+## ~Comming Soon~ 
+* Reactivity improvements for mobile devices.
 * Tags for Sites
 * Viewers displaying all sites of a tag / multiple tags
 * actual content on the main page
@@ -38,11 +41,11 @@ There are some arguments in order to configure the app:
 * Gmail Password (-pw --gmail-password --mail-password):
   Sets the password to authenticate to gmail with.
 * Gmail User (-gu --gmail-user --mail-user):
-  Sets the user to authenticate to gmail with. Also the address from which all mail is sent. Looks something like this: johndoe@gmail.com
+  Sets the user to authenticate to gmail with. Also the address from which all mail is sent. 
 * Mongo IP (-m --mongo -mip --mongo-ip):
   Tells the app where the database is. Format: \<ip\>:\<port\>. Default: localhost:27017
 * Hostname (-h --host):
-  The address to used for example in the emails. Default: localhost
+  The url to used for example in sent emails. Default: localhost
 * HTTP Port (-p --port):
   The port on which this app should listen. Default: 3000 if in dev mode, 80 if in production mode
 * HTTPS Port (--https-port):
